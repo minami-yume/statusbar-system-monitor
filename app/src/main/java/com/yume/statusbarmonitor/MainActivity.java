@@ -14,9 +14,7 @@ import com.google.android.material.color.DynamicColors;
 public class MainActivity extends AppCompatActivity {
 
     // UI 控件
-    private RadioGroup radioGroup1_1, radioGroup1_2;
-    private RadioGroup radioGroup2_1, radioGroup2_2;
-    private EditText etSize1, etOffset1, etSize2, etOffset2;
+    private EditText etSize1, etOffset1;
     private TextView statusText;
     private EditText etBitmapSize;
     private RadioGroup radioGroup1, radioGroup2;
@@ -66,11 +64,7 @@ public class MainActivity extends AppCompatActivity {
         serviceIntent.putExtra("offset", Integer.parseInt(etOffset1.getText().toString()));
         serviceIntent.putExtra("bitmapSize", Integer.parseInt(etBitmapSize.getText().toString()));
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            startForegroundService(serviceIntent);
-        } else {
-            startService(serviceIntent);
-        }
+        startForegroundService(serviceIntent);
         statusText.setText("服务已启动");
     }
 
