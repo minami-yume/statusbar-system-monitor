@@ -1,74 +1,43 @@
-name: android master CI
+name: Android Release Build & Publish
 
 on:
-  push:
-    branches: [ master ]
-    paths:
-      # Trigger only when src/** changes
-      - ".github/release.json"
+  release:
+    types: [created]
 
 jobs:
-  build:
-
+  build_apk:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write # This is crucial for uploading to a release
 
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
-      - name: set up JDK 17
-        uses: actions/setup-java@v3
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
         with:
           java-version: '17'
-          distribution: 'adopt'
+          distribution: 'temurin'
+          cache: 'gradle'
 
-      - name: Read tag_latest
-        id: tag_latest
-        uses:  ashley-taylor/read-json-property-action@v1.0
-        with:
-          path: ./.github/release.json
-          property: tag_latest
+      - name: Grant Execute Permission for gradlew
+        run: chmod +x ./gradlew
 
-      - name: Read description
-        id: description
-        uses: juliangruber/read-file-action@v1
-        with:
-          path: ./.github/release.info
+      - name: Decode Keystore
+        run: echo "${{ secrets.KEYSTORE_FILE }}" | base64 --decode > app/release.keystore
 
-      - name: Generate signing.properties
-        run: |
-          rm -rf freedom.jks
-          ${{ secrets.BASH_DOWNLOAD_JKS }}
-          echo "KEYSTORE_FILE = ${{github.workspace}}/freedom.jks" > app/signing.properties
-          echo "KEYSTORE_PASSWORD = ${{ secrets.KEYSTORE_PASSWORD }}" >> app/signing.properties
-          echo "KEY_ALIAS = ${{ secrets.KEY_ALIAS }}" >> app/signing.properties
-          echo "KEY_PASSWORD = ${{ secrets.KEY_PASSWORD }}" >> app/signing.properties
-          cat app/signing.properties
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-      - name: Build with Gradle
+      - name: Build Release APK
         run: ./gradlew assembleRelease
-
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@latest
         env:
-          GITHUB_TOKEN: ${{ secrets.TOKEN }}
-        with:
-          tag_name: ${{steps.tag_latest.outputs.value}}
-          release_name: Freedom - v${{steps.tag_latest.outputs.value}}
-          body: |
-            ${{steps.description.outputs.content}}
-          draft: false
-          prerelease: false
+          SIGNING_KEY_STORE_PASSWORD: ${{ secrets.KEY_STORE_PASSWORD }}
+          SIGNING_KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          SIGNING_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
 
-      - name: Upload Release Asset
-        id: upload-release-asset
-        uses: actions/upload-release-asset@v1
+      - name: Build and Release APK
+        uses: sangatdesai/release-apk@V1.0
         env:
-          GITHUB_TOKEN: ${{ secrets.TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./app/build/outputs/apk/release/app-release.apk
-          asset_name: Freedom.${{steps.tag_latest.outputs.value}}.apk
-          asset_content_type: application/vnd.android.package-archive
-
+          release_path: app/build/outputs/apk/release/
+          file_pattern: 'app-*-release.apk'
