@@ -11,6 +11,8 @@ jobs:
       contents: write # This is crucial for uploading to a release
 
     steps:
+      - name: Grant Execute Permission for gradlew
+        run: chmod +x ./gradlew
       - name: Build Release APK
         run: ./gradlew assembleRelease
         env:
