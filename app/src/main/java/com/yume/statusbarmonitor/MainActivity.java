@@ -81,6 +81,7 @@ public class MainActivity extends AppCompatActivity {
         if (radioButtonId == R.id.rb_percent1 || radioButtonId == R.id.rb_percent2) return "percent";
 //        if (radioButtonId == R.id.rb_mem_gb1 || radioButtonId == R.id.rb_mem_gb2) return "memory_mb";
         if (radioButtonId == R.id.rb_mem_p1 || radioButtonId == R.id.rb_mem_p2) return "memory_percent";
+        if (radioButtonId == R.id.rb_watt1 || radioButtonId == R.id.rb_watt2) return "watt";
         if (radioButtonId == R.id.rb_none1 || radioButtonId == R.id.rb_none2) return "none";
         return "none";
     }
