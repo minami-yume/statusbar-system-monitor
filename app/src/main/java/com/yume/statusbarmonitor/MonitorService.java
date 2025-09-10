@@ -165,9 +165,9 @@ public class MonitorService extends Service {
             case "temperature": return temp + "°";
             case "current": return (current / 1000) + "";
             case "voltage": return (voltage / 1000f) + "";
-            case "percent": return percent + "%";
+            case "percent": return percent + "%M";
             case "memory_mb": return memMB;
-            case "memory_percent": return memPercent + "%";
+            case "memory_percent": return memPercent + "%B";
 
             default: return "";
         }
