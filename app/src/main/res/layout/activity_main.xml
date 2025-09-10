@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    tools:context=".MainActivity">
+
+    <TextView
+        android:id="@+id/statusText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="点击按钮启动服务"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="选择第一行显示的信息"
+            android:textStyle="bold"
+            android:textColor="?attr/colorOnSurface"/>
+
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbars="none">
+
+            <RadioGroup
+                android:id="@+id/radioGroup1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <com.google.android.material.radiobutton.MaterialRadioButton android:id="@+id/rb_temp1" android:layout_width="wrap_content" android:layout_height="wrap_content" android:checked="true" android:text="温度" />
+                <com.google.android.material.radiobutton.MaterialRadioButton android:id="@+id/rb_current1" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="电流" />
+                <com.google.android.material.radiobutton.MaterialRadioButton android:id="@+id/rb_voltage1" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="电压" />
+                <com.google.android.material.radiobutton.MaterialRadioButton android:id="@+id/rb_percent1" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="电量" />
+                <com.google.android.material.radiobutton.MaterialRadioButton android:id="@+id/rb_mem_p1" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="内存(%)" />
+                <com.google.android.material.radiobutton.MaterialRadioButton android:id="@+id/rb_none1" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="无" />
+            </RadioGroup>
+        </HorizontalScrollView>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="选择第二行显示的信息"
+            android:textStyle="bold"
+            android:textColor="?attr/colorOnSurface"/>
+
+        <HorizontalScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbars="none">
+
+            <RadioGroup
+                android:id="@+id/radioGroup2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <com.google.android.material.radiobutton.MaterialRadioButton android:id="@+id/rb_temp2" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="温度" />
+                <com.google.android.material.radiobutton.MaterialRadioButton android:id="@+id/rb_current2" android:layout_width="wrap_content" android:layout_height="wrap_content" android:checked="true" android:text="电流" />
+                <com.google.android.material.radiobutton.MaterialRadioButton android:id="@+id/rb_voltage2" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="电压" />
+                <com.google.android.material.radiobutton.MaterialRadioButton android:id="@+id/rb_percent2" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="电量" />
+                <com.google.android.material.radiobutton.MaterialRadioButton android:id="@+id/rb_mem_p2" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="内存(%)" />
+                <com.google.android.material.radiobutton.MaterialRadioButton android:id="@+id/rb_none2" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="无" />
+            </RadioGroup>
+        </HorizontalScrollView>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:hint="字体大小"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_size1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:text="50" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:hint="行间距"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_offset1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:text="25" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:hint="图标尺寸"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/et_bitmap_size"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:text="100" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+    </LinearLayout>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/startButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="启动服务"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/stopButton"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/stopButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="停止服务"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/startButton"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
+</androidx.constraintlayout.widget.ConstraintLayout>
