@@ -3,6 +3,7 @@ package com.yume.statusbarmonitor;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioGroup;
@@ -85,12 +86,26 @@ public class MainActivity extends AppCompatActivity {
     private void loadSettings() {
         SharedPreferences sharedPrefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
 
-        int data1Id = sharedPrefs.getInt(KEY_DATA1_ID, R.id.rb_mem_p1); // 默认选中内存
-        int data2Id = sharedPrefs.getInt(KEY_DATA2_ID, R.id.rb_watt2); // 默认选中瓦
-        String fontSize = sharedPrefs.getString(KEY_FONT_SIZE, "32");
-        String offset = sharedPrefs.getString(KEY_OFFSET, "15");
-        String bitmapSize = sharedPrefs.getString(KEY_BITMAP_SIZE, "64");
-        int refreshRatePos = sharedPrefs.getInt(KEY_REFRESH_RATE_POS, 2); // 默认选中3秒
+        int data1Id = R.id.rb_mem_p1;
+        int data2Id = R.id.rb_watt2;
+        String fontSize = "32";
+        String offset = "15";
+        String bitmapSize = "64";
+        int refreshRatePos = 2;
+
+        try {
+            // 尝试从 SharedPreferences 中加载设置
+            data1Id = sharedPrefs.getInt(KEY_DATA1_ID, R.id.rb_mem_p1);
+            data2Id = sharedPrefs.getInt(KEY_DATA2_ID, R.id.rb_watt2);
+            fontSize = sharedPrefs.getString(KEY_FONT_SIZE, "32");
+            offset = sharedPrefs.getString(KEY_OFFSET, "15");
+            bitmapSize = sharedPrefs.getString(KEY_BITMAP_SIZE, "64");
+            refreshRatePos = sharedPrefs.getInt(KEY_REFRESH_RATE_POS, 2);
+        } catch (ClassCastException e) {
+            // 如果数据类型不匹配，打印错误日志并使用默认值
+            // 这通常发生在 SharedPreferences 文件损坏或数据类型改变时
+            Log.e("MainActivity", "Failed to load settings from SharedPreferences, using default values.", e);
+        }
 
         radioGroup1.check(data1Id);
         radioGroup2.check(data2Id);
@@ -99,6 +114,7 @@ public class MainActivity extends AppCompatActivity {
         etBitmapSize.setText(bitmapSize);
         refreshRateSpinner.setSelection(refreshRatePos);
     }
+
 
     private void startServiceWithSettings() {
         Intent serviceIntent = new Intent(this, MonitorService.class);
