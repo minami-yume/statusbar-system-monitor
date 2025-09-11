@@ -29,13 +29,15 @@ import com.google.android.material.color.DynamicColors;
 public class MonitorService extends Service {
 
     private static final String CHANNEL_ID = "BatteryMonitorChannel";
-    private static final long UPDATE_INTERVAL = 3000;
 
     private NotificationManager notificationManager;
     private Handler handler;
     private Runnable updateTask;
     // 存储用户设置
     private Bundle settings;
+
+    // 新增：可变更新频率
+    private int updateInterval;
 
     @Override
     public void onCreate() {
@@ -52,9 +54,12 @@ public class MonitorService extends Service {
         settings = new Bundle();
         settings.putString("data1", intent.getStringExtra("data1"));
         settings.putString("data2", intent.getStringExtra("data2"));
-        settings.putInt("size", intent.getIntExtra("size", 50));
-        settings.putInt("offset", intent.getIntExtra("offset", 25));
-        settings.putInt("bitmapSize", intent.getIntExtra("bitmapSize", 100));
+        settings.putInt("size", intent.getIntExtra("size", 32));
+        settings.putInt("offset", intent.getIntExtra("offset", 15));
+        settings.putInt("bitmapSize", intent.getIntExtra("bitmapSize", 64));
+
+        // 新增：从 Intent 中获取更新频率，如果不存在则默认为 5000 毫秒（5秒）
+        updateInterval = intent.getIntExtra("interval", 3000);
 
         // 创建初始通知并启动前台服务
         Notification initialNotification = createNotification(settings, "...","");
@@ -99,8 +104,8 @@ public class MonitorService extends Service {
                 Notification updatedNotification = createNotification(settings, finalContent,finalFullContent);
                 notificationManager.notify(1, updatedNotification);
 
-                // 再次发布任务
-                handler.postDelayed(this, UPDATE_INTERVAL);
+                // 再次发布任务，使用用户设置的频率
+                handler.postDelayed(this, updateInterval);
             }
         };
 
@@ -126,7 +131,7 @@ public class MonitorService extends Service {
     }
 
     // 创建通知的方法， now uses Bundle for settings
-    private Notification createNotification(Bundle settings, String content,String fullContent) {
+    private Notification createNotification(Bundle settings, String content, String fullContent) {
         int bitmapSize = settings.getInt("bitmapSize");
         Bitmap bitmap = Bitmap.createBitmap(bitmapSize, bitmapSize, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
@@ -140,21 +145,30 @@ public class MonitorService extends Service {
         paint.setColor(Color.WHITE);
         paint.setTextSize(fontSize);
         paint.setTypeface(Typeface.DEFAULT_BOLD);
-        paint.setTextAlign(Paint.Align.CENTER);
 
+        // 设置为左对齐
+        paint.setTextAlign(Paint.Align.LEFT);
+
+
+        float centerY = (bitmap.getHeight() / 2f) - (paint.descent() + paint.ascent()) / 2;
         if (lines.length > 0) {
-            canvas.drawText(lines[0], bitmap.getWidth() / 2f, (bitmap.getHeight() / 2f) - (paint.descent() + paint.ascent()) / 2 - offset, paint);
+            canvas.drawText(lines[0], 1, centerY - offset, paint);
         }
         if (lines.length > 1) {
-            canvas.drawText(lines[1], bitmap.getWidth() / 2f, (bitmap.getHeight() / 2f) - (paint.descent() + paint.ascent()) / 2 + offset, paint);
+            canvas.drawText(lines[1], 1, centerY + offset, paint);
         }
+        // 中间对齐
+//        if (lines.length > 0) {
+//            canvas.drawText(lines[0], bitmap.getWidth() / 2f, (bitmap.getHeight() / 2f) - (paint.descent() + paint.ascent()) / 2 - offset, paint);
+//        }
+//        if (lines.length > 1) {
+//            canvas.drawText(lines[1], bitmap.getWidth() / 2f, (bitmap.getHeight() / 2f) - (paint.descent() + paint.ascent()) / 2 + offset, paint);
+//        }
 
         IconCompat icon = IconCompat.createWithBitmap(bitmap);
 
         return new NotificationCompat.Builder(this, CHANNEL_ID)
-//                .setContentTitle("系统状态")
-                .setContentTitle(fullContent.replace("\n", ", "))
-//                .setContentText(fullContent.replace("\n", ", "))
+                .setContentTitle(fullContent.replace("\t", ", "))
                 .setSmallIcon(icon)
                 .build();
     }
@@ -177,17 +191,11 @@ public class MonitorService extends Service {
     private String getFullDataValue(String key, int temp, long current, int voltage, int percent, String memMB, int memPercent) {
         switch (key) {
             case "temperature": return "Temperature:" + temp + "°C";
-
             case "current": return "Current:" + (current / 1000) + "mA";
-
             case "voltage": return "Voltage:" + (voltage / 1000f) + "V";
-
             case "percent": return "Battery:" + percent + "%";
-
             case "memory_mb": return "Memory:" + memMB;
-
             case "memory_percent": return "MemoryUsage:" + memPercent + "%";
-
             case "watt":
                 double watts = (current * voltage) / 1000000000.0;
                 return "Watts:"+String.format("%.3fW", watts);
