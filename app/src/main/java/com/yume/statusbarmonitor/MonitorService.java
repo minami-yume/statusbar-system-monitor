@@ -81,11 +81,12 @@ public class MonitorService extends Service {
                 long currentNow = getBatteryCurrentNow();
                 String memoryUsageMB = getMemoryUsageMB();
                 int memoryUsagePercent = getMemoryUsagePercent();
+                int wattsDivisor=settings.getInt(Constants.KEY_DIVISOR);
 
-                String content1 = getDataValue(settings.getString(Constants.KEY_DATA1), temperature, currentNow, voltage, percent, memoryUsageMB, memoryUsagePercent);
-                String content2 = getDataValue(settings.getString(Constants.KEY_DATA2), temperature, currentNow, voltage, percent, memoryUsageMB, memoryUsagePercent);
-                String fullContent1 = getFullDataValue(settings.getString(Constants.KEY_DATA1), temperature, currentNow, voltage, percent, memoryUsageMB, memoryUsagePercent);
-                String fullContent2 = getFullDataValue(settings.getString(Constants.KEY_DATA2), temperature, currentNow, voltage, percent, memoryUsageMB, memoryUsagePercent);
+                String content1 = getDataValue(settings.getString(Constants.KEY_DATA1), temperature, currentNow, voltage, percent, memoryUsageMB, memoryUsagePercent,wattsDivisor);
+                String content2 = getDataValue(settings.getString(Constants.KEY_DATA2), temperature, currentNow, voltage, percent, memoryUsageMB, memoryUsagePercent,wattsDivisor);
+                String fullContent1 = getFullDataValue(settings.getString(Constants.KEY_DATA1), temperature, currentNow, voltage, percent, memoryUsageMB, memoryUsagePercent,wattsDivisor);
+                String fullContent2 = getFullDataValue(settings.getString(Constants.KEY_DATA2), temperature, currentNow, voltage, percent, memoryUsageMB, memoryUsagePercent,wattsDivisor);
 
                 String finalContent = content1;
                 if (!"none".equals(settings.getString(Constants.KEY_DATA2))) {
@@ -139,12 +140,14 @@ public class MonitorService extends Service {
             loadedSettings.putInt(Constants.KEY_OFFSET, Integer.parseInt(sharedPrefs.getString(Constants.KEY_OFFSET, "15")));
             loadedSettings.putInt(Constants.KEY_BITMAP_SIZE, Integer.parseInt(sharedPrefs.getString(Constants.KEY_BITMAP_SIZE, "64")));
             loadedSettings.putInt(Constants.KEY_PADDING_X, Integer.parseInt(sharedPrefs.getString(Constants.KEY_PADDING_X, "-2")));
+            loadedSettings.putInt(Constants.KEY_DIVISOR,Integer.parseInt(sharedPrefs.getString(Constants.KEY_DIVISOR,"1000000000")));
         } catch (NumberFormatException e) {
             Log.e("MonitorService", "Error parsing number from SharedPreferences, using defaults.", e);
             loadedSettings.putInt(Constants.KEY_FONT_SIZE, 32);
             loadedSettings.putInt(Constants.KEY_OFFSET, 15);
             loadedSettings.putInt(Constants.KEY_BITMAP_SIZE, 64);
             loadedSettings.putInt(Constants.KEY_PADDING_X, -2);
+            loadedSettings.putInt(Constants.KEY_DIVISOR,1000000000);
         }
 
         loadedSettings.putInt(Constants.KEY_REFRESH_RATE_POS, sharedPrefs.getInt(Constants.KEY_REFRESH_RATE_POS, 2));
@@ -220,31 +223,41 @@ public class MonitorService extends Service {
 
     // ... (保持 getDataValue, getFullDataValue, getBatteryCurrentNow, getMemoryUsageMB, getMemoryUsagePercent, createNotificationChannel 等方法不变)
     @SuppressLint("DefaultLocale")
-    private String getDataValue(String key, int temp, long current, int voltage, int percent, String memMB, int memPercent) {
+    private String getDataValue(String key, int temp, long current, int voltage, int percent, String memMB, int memPercent, int wDivisor) {
         switch (key) {
             case "temperature": return temp + "°";
             case "current": return Math.abs(current)+"";
-            case "voltage": return String.format("%.1fⱽ", (voltage / 1000f));
+            case "voltage":
+                if(voltage==3||voltage==4){
+                    return voltage+"";
+                }else {
+                    return String.format("%.1f", (voltage / 1000f));
+                }
             case "percent": return percent + "%" ;
             case "memory_mb": return memMB;
             case "memory_percent": return "ᔿ"+memPercent ;
             case "watt":
-                double watts = (Math.abs(current) * voltage) / 1000000000.0;
+                double watts = (Math.abs(current) * voltage) / (1.0*wDivisor);
                 return String.format("%.1f", watts);
             default: return "";
         }
     }
     @SuppressLint("DefaultLocale")
-    private String getFullDataValue(String key, int temp, long current, int voltage, int percent, String memMB, int memPercent) {
+    private String getFullDataValue(String key, int temp, long current, int voltage, int percent, String memMB, int memPercent, int wDivisor) {
         switch (key) {
             case "temperature": return "Temperature:" + temp + "°C";
             case "current": return "Current:" + (current / 1000) + "mA";
-            case "voltage": return "Voltage:" + (voltage / 1000f) + "V";
+            case "voltage":
+                if(voltage==3||voltage==4){
+                    return "Voltage:" + voltage + "V";
+                }else {
+                    return "Voltage:" + (voltage / 1000f) + "V";
+                }
             case "percent": return "Battery:" + percent + "%";
             case "memory_mb": return "Memory:" + memMB;
             case "memory_percent": return "MemoryUsage:" + memPercent + "%";
             case "watt":
-                double watts = (current * voltage) / 1000000000.0;
+                double watts = (current * voltage) / (1.0*wDivisor);
                 return "Watts:"+String.format("%.3fW", watts);
             default: return "";
         }

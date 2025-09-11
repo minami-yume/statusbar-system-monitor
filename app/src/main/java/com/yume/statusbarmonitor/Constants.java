@@ -16,6 +16,7 @@ public final class Constants {
     public static final String KEY_REFRESH_RATE_POS = "refresh_rate_position";
     public static final String KEY_PADDING_X = "padding_x";
     public static final String KEY_FONT_CHOICE = "font_choice";
+    public static final String KEY_DIVISOR = "divisor";
 
     // 字体文件名列表，与 arrays.xml 中的顺序对应
     public static final String[] FONT_FILENAMES = {

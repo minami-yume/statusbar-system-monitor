@@ -21,6 +21,7 @@ public class MainActivity extends AppCompatActivity {
     private RadioGroup radioGroup1, radioGroup2;
     private Spinner refreshRateSpinner, fontSpinner;
     private EditText etPadding;
+    private  EditText etDivisor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +39,7 @@ public class MainActivity extends AppCompatActivity {
         refreshRateSpinner = findViewById(R.id.refresh_rate_spinner);
         etPadding = findViewById(R.id.et_padding);
         fontSpinner = findViewById(R.id.font_spinner);
+        etDivisor = findViewById(R.id.et_divisor);
 
         loadSettings();
 
@@ -70,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
         editor.putInt(Constants.KEY_REFRESH_RATE_POS, refreshRateSpinner.getSelectedItemPosition());
         editor.putString(Constants.KEY_PADDING_X, etPadding.getText().toString());
         editor.putInt(Constants.KEY_FONT_CHOICE, fontSpinner.getSelectedItemPosition());
-
+        editor.putString(Constants.KEY_DIVISOR,etDivisor.getText().toString());
         editor.apply();
     }
 
@@ -85,6 +87,7 @@ public class MainActivity extends AppCompatActivity {
         int refreshRatePos = 2;
         String paddingX = "-2";
         int savedFontPosition = 0;
+        String divisor="1000000000";
 
         try {
             data1Id = sharedPrefs.getInt(Constants.KEY_DATA1, R.id.rb_mem_p1);
@@ -95,6 +98,7 @@ public class MainActivity extends AppCompatActivity {
             refreshRatePos = sharedPrefs.getInt(Constants.KEY_REFRESH_RATE_POS, 2);
             paddingX = sharedPrefs.getString(Constants.KEY_PADDING_X, "-2");
             savedFontPosition = sharedPrefs.getInt(Constants.KEY_FONT_CHOICE, 0);
+            divisor = sharedPrefs.getString(Constants.KEY_DIVISOR,"1000000000");
         } catch (ClassCastException e) {
             Log.e("MainActivity", "Failed to load settings from SharedPreferences, using default values.", e);
         }
@@ -107,6 +111,7 @@ public class MainActivity extends AppCompatActivity {
         refreshRateSpinner.setSelection(refreshRatePos);
         etPadding.setText(paddingX);
         fontSpinner.setSelection(savedFontPosition);
+        etDivisor.setText(divisor);
     }
 
     private void startServiceWithSettings() {
@@ -120,6 +125,7 @@ public class MainActivity extends AppCompatActivity {
         serviceIntent.putExtra(Constants.KEY_OFFSET, Integer.parseInt(etOffset1.getText().toString()));
         serviceIntent.putExtra(Constants.KEY_BITMAP_SIZE, Integer.parseInt(etBitmapSize.getText().toString()));
         serviceIntent.putExtra(Constants.KEY_PADDING_X, Integer.parseInt(etPadding.getText().toString()));
+        serviceIntent.putExtra(Constants.KEY_DIVISOR, Integer.parseInt(etDivisor.getText().toString()));
 
         String selectedRate = refreshRateSpinner.getSelectedItem().toString();
         int interval = Integer.parseInt(selectedRate.replace("s", "")) * 1000;
