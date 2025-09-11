@@ -1,5 +1,6 @@
 package com.yume.statusbarmonitor;
 
+import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -174,20 +175,22 @@ public class MonitorService extends Service {
     }
 
     // 修改 getDataValue 方法，增加对新内存百分比的支持
+    @SuppressLint("DefaultLocale")
     private String getDataValue(String key, int temp, long current, int voltage, int percent, String memMB, int memPercent) {
         switch (key) {
             case "temperature": return temp + "°";
             case "current": return (current / 1000) + "";
-            case "voltage": return (voltage / 1000f) + "";
-            case "percent": return "B"+percent ;
+            case "voltage": return String.format("%.1fⱽ", (voltage / 1000f));
+            case "percent": return percent + "%" ;
             case "memory_mb": return memMB;
-            case "memory_percent": return "M"+memPercent ;
+            case "memory_percent": return "ᔿ"+memPercent ;
             case "watt":
                 double watts = (current * voltage) / 1000000000.0;
-                return String.format("%.1f", watts);
+                return String.format("%.1fʷ", watts);
             default: return "";
         }
     }
+    @SuppressLint("DefaultLocale")
     private String getFullDataValue(String key, int temp, long current, int voltage, int percent, String memMB, int memPercent) {
         switch (key) {
             case "temperature": return "Temperature:" + temp + "°C";
