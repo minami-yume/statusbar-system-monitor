@@ -58,10 +58,11 @@ public class MonitorService extends Service {
         settings.putInt("size", intent.getIntExtra("size", 32));
         settings.putInt("offset", intent.getIntExtra("offset", 15));
         settings.putInt("bitmapSize", intent.getIntExtra("bitmapSize", 64));
-
+        settings.putInt("padding_x", intent.getIntExtra("padding_x", -2));
         // 新增：从 Intent 中获取更新频率，如果不存在则默认为 5000 毫秒（5秒）
         updateInterval = intent.getIntExtra("interval", 3000);
-
+        // 新增左边距
+        settings.putInt("padding_x", intent.getIntExtra("padding_x", -2));
         // 创建初始通知并启动前台服务
         Notification initialNotification = createNotification(settings, "...","");
         startForeground(1, initialNotification);
@@ -141,11 +142,13 @@ public class MonitorService extends Service {
         String[] lines = content.split("\t");
         int fontSize = settings.getInt("size");
         int offset = settings.getInt("offset");
+        int paddingX = settings.getInt("padding_x");
 
         Paint paint = new Paint();
         paint.setColor(Color.WHITE);
         paint.setTextSize(fontSize);
         paint.setTypeface(Typeface.DEFAULT_BOLD);
+
 
         // 设置为左对齐
         paint.setTextAlign(Paint.Align.LEFT);
@@ -153,10 +156,10 @@ public class MonitorService extends Service {
 
         float centerY = (bitmap.getHeight() / 2f) - (paint.descent() + paint.ascent()) / 2;
         if (lines.length > 0) {
-            canvas.drawText(lines[0], 1, centerY - offset, paint);
+            canvas.drawText(lines[0], paddingX, centerY - offset, paint);
         }
         if (lines.length > 1) {
-            canvas.drawText(lines[1], 1, centerY + offset, paint);
+            canvas.drawText(lines[1], paddingX, centerY + offset, paint);
         }
         // 中间对齐
 //        if (lines.length > 0) {
@@ -186,7 +189,7 @@ public class MonitorService extends Service {
             case "memory_percent": return "ᔿ"+memPercent ;
             case "watt":
                 double watts = (current * voltage) / 1000000000.0;
-                return String.format("%.1fʷ", watts);
+                return String.format("%.1f", watts);
             default: return "";
         }
     }

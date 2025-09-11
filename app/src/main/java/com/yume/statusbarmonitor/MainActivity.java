@@ -21,6 +21,7 @@ public class MainActivity extends AppCompatActivity {
     private EditText etBitmapSize;
     private RadioGroup radioGroup1, radioGroup2;
     private Spinner refreshRateSpinner; // 新增：刷新频率下拉菜单
+    private EditText etPadding;
 
     // SharedPreferences 键
     private static final String PREFS_NAME = "app_settings";
@@ -30,6 +31,8 @@ public class MainActivity extends AppCompatActivity {
     private static final String KEY_OFFSET = "offset";
     private static final String KEY_BITMAP_SIZE = "bitmap_size";
     private static final String KEY_REFRESH_RATE_POS = "refresh_rate_position";
+
+    private static final String KEY_PADDING_X = "padding_x";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
         radioGroup1 = findViewById(R.id.radioGroup1);
         radioGroup2 = findViewById(R.id.radioGroup2);
         refreshRateSpinner = findViewById(R.id.refresh_rate_spinner); // 初始化 Spinner
+        etPadding = findViewById(R.id.et_padding);
 
         // 加载用户设置
         loadSettings();
@@ -79,6 +83,7 @@ public class MainActivity extends AppCompatActivity {
         editor.putString(KEY_OFFSET, etOffset1.getText().toString());
         editor.putString(KEY_BITMAP_SIZE, etBitmapSize.getText().toString());
         editor.putInt(KEY_REFRESH_RATE_POS, refreshRateSpinner.getSelectedItemPosition());
+        editor.putString(KEY_PADDING_X, etPadding.getText().toString());
 
         editor.apply();
     }
@@ -92,6 +97,8 @@ public class MainActivity extends AppCompatActivity {
         String offset = "15";
         String bitmapSize = "64";
         int refreshRatePos = 2;
+        String paddingX ="-2";
+
 
         try {
             // 尝试从 SharedPreferences 中加载设置
@@ -101,6 +108,7 @@ public class MainActivity extends AppCompatActivity {
             offset = sharedPrefs.getString(KEY_OFFSET, "15");
             bitmapSize = sharedPrefs.getString(KEY_BITMAP_SIZE, "64");
             refreshRatePos = sharedPrefs.getInt(KEY_REFRESH_RATE_POS, 2);
+            paddingX = sharedPrefs.getString(KEY_PADDING_X, "-2");
         } catch (ClassCastException e) {
             // 如果数据类型不匹配，打印错误日志并使用默认值
             // 这通常发生在 SharedPreferences 文件损坏或数据类型改变时
@@ -113,6 +121,7 @@ public class MainActivity extends AppCompatActivity {
         etOffset1.setText(offset);
         etBitmapSize.setText(bitmapSize);
         refreshRateSpinner.setSelection(refreshRatePos);
+        etPadding.setText(paddingX);
     }
 
 
@@ -127,6 +136,7 @@ public class MainActivity extends AppCompatActivity {
         serviceIntent.putExtra("size", Integer.parseInt(etSize1.getText().toString()));
         serviceIntent.putExtra("offset", Integer.parseInt(etOffset1.getText().toString()));
         serviceIntent.putExtra("bitmapSize", Integer.parseInt(etBitmapSize.getText().toString()));
+        serviceIntent.putExtra("padding_x", Integer.parseInt(etPadding.getText().toString()));
 
         // 新增：获取并传递刷新频率
         String selectedRate = refreshRateSpinner.getSelectedItem().toString();
