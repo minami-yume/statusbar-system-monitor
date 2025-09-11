@@ -237,7 +237,7 @@ public class MonitorService extends Service {
             case "memory_mb": return memMB;
             case "memory_percent": return "ᔿ"+memPercent ;
             case "watt":
-                double watts = (Math.abs(current) * voltage) / (1.0*wDivisor);
+                double watts = (Math.abs(current) * voltage) / (double)wDivisor;
                 return String.format("%.1f", watts);
             default: return "";
         }
@@ -257,7 +257,7 @@ public class MonitorService extends Service {
             case "memory_mb": return "Memory:" + memMB;
             case "memory_percent": return "MemoryUsage:" + memPercent + "%";
             case "watt":
-                double watts = (current * voltage) / (1.0*wDivisor);
+                double watts = (current * voltage) / (double)wDivisor;
                 return "Watts:"+String.format("%.3fW", watts);
             default: return "";
         }
