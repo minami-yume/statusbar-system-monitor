@@ -45,12 +45,27 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
+
+                <com.google.android.material.radiobutton.MaterialRadioButton
+                    android:id="@+id/rb_watt1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="功耗" />
+
                 <com.google.android.material.radiobutton.MaterialRadioButton android:id="@+id/rb_temp1" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="电池温度" />
+
+                <com.google.android.material.radiobutton.MaterialRadioButton
+                    android:id="@+id/rb_mem_p1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    android:text="内存占用" />
+
                 <com.google.android.material.radiobutton.MaterialRadioButton android:id="@+id/rb_current1" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="电流" />
                 <com.google.android.material.radiobutton.MaterialRadioButton android:id="@+id/rb_voltage1" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="电压" />
-                <com.google.android.material.radiobutton.MaterialRadioButton android:id="@+id/rb_watt1" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="功耗" />
+
                 <com.google.android.material.radiobutton.MaterialRadioButton android:id="@+id/rb_percent1" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="电量" />
-                <com.google.android.material.radiobutton.MaterialRadioButton android:id="@+id/rb_mem_p1" android:layout_width="wrap_content" android:layout_height="wrap_content" android:checked="true" android:text="内存占用" />
+
                 <com.google.android.material.radiobutton.MaterialRadioButton android:id="@+id/rb_none1" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="无" />
             </RadioGroup>
         </HorizontalScrollView>
@@ -72,12 +87,27 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
+
+                <com.google.android.material.radiobutton.MaterialRadioButton
+                    android:id="@+id/rb_watt2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="true"
+                    android:text="功耗" />
+
                 <com.google.android.material.radiobutton.MaterialRadioButton android:id="@+id/rb_temp2" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="电池温度" />
+
+                <com.google.android.material.radiobutton.MaterialRadioButton
+                    android:id="@+id/rb_mem_p2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="内存占用" />
+
                 <com.google.android.material.radiobutton.MaterialRadioButton android:id="@+id/rb_current2" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="电流" />
                 <com.google.android.material.radiobutton.MaterialRadioButton android:id="@+id/rb_voltage2" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="电压" />
-                <com.google.android.material.radiobutton.MaterialRadioButton android:id="@+id/rb_watt2" android:layout_width="wrap_content" android:layout_height="wrap_content" android:checked="true" android:text="功耗" />
+
                 <com.google.android.material.radiobutton.MaterialRadioButton android:id="@+id/rb_percent2" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="电量" />
-                <com.google.android.material.radiobutton.MaterialRadioButton android:id="@+id/rb_mem_p2" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="内存占用" />
+
                 <com.google.android.material.radiobutton.MaterialRadioButton android:id="@+id/rb_none2" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="无" />
             </RadioGroup>
         </HorizontalScrollView>
