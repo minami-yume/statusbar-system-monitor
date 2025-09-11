@@ -170,7 +170,7 @@ public class MonitorService extends Service {
             case "memory_percent": return "M"+memPercent ;
             case "watt":
                 double watts = (current * voltage) / 1000000000.0;
-                return String.format("%.2f", watts);
+                return String.format("%.1f", watts);
             default: return "";
         }
     }
@@ -190,7 +190,7 @@ public class MonitorService extends Service {
 
             case "watt":
                 double watts = (current * voltage) / 1000000000.0;
-                return "Watts:"+String.format("%.2fW", watts);
+                return "Watts:"+String.format("%.3fW", watts);
             default: return "";
         }
     }
