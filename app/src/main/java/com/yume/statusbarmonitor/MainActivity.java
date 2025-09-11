@@ -15,24 +15,12 @@ import com.google.android.material.color.DynamicColors;
 
 public class MainActivity extends AppCompatActivity {
 
-    // UI 控件
     private EditText etSize1, etOffset1;
     private TextView statusText;
     private EditText etBitmapSize;
     private RadioGroup radioGroup1, radioGroup2;
-    private Spinner refreshRateSpinner; // 新增：刷新频率下拉菜单
+    private Spinner refreshRateSpinner, fontSpinner;
     private EditText etPadding;
-
-    // SharedPreferences 键
-    private static final String PREFS_NAME = "app_settings";
-    private static final String KEY_DATA1_ID = "data1_id";
-    private static final String KEY_DATA2_ID = "data2_id";
-    private static final String KEY_FONT_SIZE = "font_size";
-    private static final String KEY_OFFSET = "offset";
-    private static final String KEY_BITMAP_SIZE = "bitmap_size";
-    private static final String KEY_REFRESH_RATE_POS = "refresh_rate_position";
-
-    private static final String KEY_PADDING_X = "padding_x";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,16 +35,14 @@ public class MainActivity extends AppCompatActivity {
         etBitmapSize = findViewById(R.id.et_bitmap_size);
         radioGroup1 = findViewById(R.id.radioGroup1);
         radioGroup2 = findViewById(R.id.radioGroup2);
-        refreshRateSpinner = findViewById(R.id.refresh_rate_spinner); // 初始化 Spinner
+        refreshRateSpinner = findViewById(R.id.refresh_rate_spinner);
         etPadding = findViewById(R.id.et_padding);
+        fontSpinner = findViewById(R.id.font_spinner);
 
-        // 加载用户设置
         loadSettings();
 
         Button startButton = findViewById(R.id.startButton);
-        startButton.setOnClickListener(v -> {
-            startServiceWithSettings();
-        });
+        startButton.setOnClickListener(v -> startServiceWithSettings());
 
         Button stopButton = findViewById(R.id.stopButton);
         stopButton.setOnClickListener(v -> {
@@ -69,27 +55,27 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        // 在应用暂停时保存设置
         saveSettings();
     }
 
     private void saveSettings() {
-        SharedPreferences sharedPrefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        SharedPreferences sharedPrefs = getSharedPreferences(Constants.PREFS_NAME, MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPrefs.edit();
 
-        editor.putInt(KEY_DATA1_ID, radioGroup1.getCheckedRadioButtonId());
-        editor.putInt(KEY_DATA2_ID, radioGroup2.getCheckedRadioButtonId());
-        editor.putString(KEY_FONT_SIZE, etSize1.getText().toString());
-        editor.putString(KEY_OFFSET, etOffset1.getText().toString());
-        editor.putString(KEY_BITMAP_SIZE, etBitmapSize.getText().toString());
-        editor.putInt(KEY_REFRESH_RATE_POS, refreshRateSpinner.getSelectedItemPosition());
-        editor.putString(KEY_PADDING_X, etPadding.getText().toString());
+        editor.putInt(Constants.KEY_DATA1, radioGroup1.getCheckedRadioButtonId());
+        editor.putInt(Constants.KEY_DATA2, radioGroup2.getCheckedRadioButtonId());
+        editor.putString(Constants.KEY_FONT_SIZE, etSize1.getText().toString());
+        editor.putString(Constants.KEY_OFFSET, etOffset1.getText().toString());
+        editor.putString(Constants.KEY_BITMAP_SIZE, etBitmapSize.getText().toString());
+        editor.putInt(Constants.KEY_REFRESH_RATE_POS, refreshRateSpinner.getSelectedItemPosition());
+        editor.putString(Constants.KEY_PADDING_X, etPadding.getText().toString());
+        editor.putInt(Constants.KEY_FONT_CHOICE, fontSpinner.getSelectedItemPosition());
 
         editor.apply();
     }
 
     private void loadSettings() {
-        SharedPreferences sharedPrefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        SharedPreferences sharedPrefs = getSharedPreferences(Constants.PREFS_NAME, MODE_PRIVATE);
 
         int data1Id = R.id.rb_mem_p1;
         int data2Id = R.id.rb_watt2;
@@ -97,21 +83,19 @@ public class MainActivity extends AppCompatActivity {
         String offset = "15";
         String bitmapSize = "64";
         int refreshRatePos = 2;
-        String paddingX ="-2";
-
+        String paddingX = "-2";
+        int savedFontPosition = 0;
 
         try {
-            // 尝试从 SharedPreferences 中加载设置
-            data1Id = sharedPrefs.getInt(KEY_DATA1_ID, R.id.rb_mem_p1);
-            data2Id = sharedPrefs.getInt(KEY_DATA2_ID, R.id.rb_watt2);
-            fontSize = sharedPrefs.getString(KEY_FONT_SIZE, "32");
-            offset = sharedPrefs.getString(KEY_OFFSET, "15");
-            bitmapSize = sharedPrefs.getString(KEY_BITMAP_SIZE, "64");
-            refreshRatePos = sharedPrefs.getInt(KEY_REFRESH_RATE_POS, 2);
-            paddingX = sharedPrefs.getString(KEY_PADDING_X, "-2");
+            data1Id = sharedPrefs.getInt(Constants.KEY_DATA1, R.id.rb_mem_p1);
+            data2Id = sharedPrefs.getInt(Constants.KEY_DATA2, R.id.rb_watt2);
+            fontSize = sharedPrefs.getString(Constants.KEY_FONT_SIZE, "32");
+            offset = sharedPrefs.getString(Constants.KEY_OFFSET, "15");
+            bitmapSize = sharedPrefs.getString(Constants.KEY_BITMAP_SIZE, "64");
+            refreshRatePos = sharedPrefs.getInt(Constants.KEY_REFRESH_RATE_POS, 2);
+            paddingX = sharedPrefs.getString(Constants.KEY_PADDING_X, "-2");
+            savedFontPosition = sharedPrefs.getInt(Constants.KEY_FONT_CHOICE, 0);
         } catch (ClassCastException e) {
-            // 如果数据类型不匹配，打印错误日志并使用默认值
-            // 这通常发生在 SharedPreferences 文件损坏或数据类型改变时
             Log.e("MainActivity", "Failed to load settings from SharedPreferences, using default values.", e);
         }
 
@@ -122,26 +106,27 @@ public class MainActivity extends AppCompatActivity {
         etBitmapSize.setText(bitmapSize);
         refreshRateSpinner.setSelection(refreshRatePos);
         etPadding.setText(paddingX);
+        fontSpinner.setSelection(savedFontPosition);
     }
-
 
     private void startServiceWithSettings() {
         Intent serviceIntent = new Intent(this, MonitorService.class);
 
-        // 获取并传递用户设置
         int selectedId1 = radioGroup1.getCheckedRadioButtonId();
         int selectedId2 = radioGroup2.getCheckedRadioButtonId();
-        serviceIntent.putExtra("data1", getDataKey(selectedId1));
-        serviceIntent.putExtra("data2", getDataKey(selectedId2));
-        serviceIntent.putExtra("size", Integer.parseInt(etSize1.getText().toString()));
-        serviceIntent.putExtra("offset", Integer.parseInt(etOffset1.getText().toString()));
-        serviceIntent.putExtra("bitmapSize", Integer.parseInt(etBitmapSize.getText().toString()));
-        serviceIntent.putExtra("padding_x", Integer.parseInt(etPadding.getText().toString()));
+        serviceIntent.putExtra(Constants.KEY_DATA1, getDataKey(selectedId1));
+        serviceIntent.putExtra(Constants.KEY_DATA2, getDataKey(selectedId2));
+        serviceIntent.putExtra(Constants.KEY_FONT_SIZE, Integer.parseInt(etSize1.getText().toString()));
+        serviceIntent.putExtra(Constants.KEY_OFFSET, Integer.parseInt(etOffset1.getText().toString()));
+        serviceIntent.putExtra(Constants.KEY_BITMAP_SIZE, Integer.parseInt(etBitmapSize.getText().toString()));
+        serviceIntent.putExtra(Constants.KEY_PADDING_X, Integer.parseInt(etPadding.getText().toString()));
 
-        // 新增：获取并传递刷新频率
         String selectedRate = refreshRateSpinner.getSelectedItem().toString();
         int interval = Integer.parseInt(selectedRate.replace("s", "")) * 1000;
         serviceIntent.putExtra("interval", interval);
+
+        int selectedFontPosition = fontSpinner.getSelectedItemPosition();
+        serviceIntent.putExtra(Constants.KEY_FONT_CHOICE, selectedFontPosition);
 
         startForegroundService(serviceIntent);
         statusText.setText("服务已启动");
@@ -151,9 +136,9 @@ public class MainActivity extends AppCompatActivity {
         if (radioButtonId == R.id.rb_temp1 || radioButtonId == R.id.rb_temp2) return "temperature";
         if (radioButtonId == R.id.rb_current1 || radioButtonId == R.id.rb_current2) return "current";
         if (radioButtonId == R.id.rb_voltage1 || radioButtonId == R.id.rb_voltage2) return "voltage";
+        if (radioButtonId == R.id.rb_watt1 || radioButtonId == R.id.rb_watt2) return "watt";
         if (radioButtonId == R.id.rb_percent1 || radioButtonId == R.id.rb_percent2) return "percent";
         if (radioButtonId == R.id.rb_mem_p1 || radioButtonId == R.id.rb_mem_p2) return "memory_percent";
-        if (radioButtonId == R.id.rb_watt1 || radioButtonId == R.id.rb_watt2) return "watt";
         if (radioButtonId == R.id.rb_none1 || radioButtonId == R.id.rb_none2) return "none";
         return "none";
     }

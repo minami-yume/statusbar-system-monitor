@@ -93,7 +93,17 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:entries="@array/refresh_rates" />
-
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="选择字体"
+            android:textStyle="normal"
+            android:textColor="?attr/colorOnSurface"/>
+        <Spinner
+            android:id="@+id/font_spinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:entries="@array/font_options" />
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

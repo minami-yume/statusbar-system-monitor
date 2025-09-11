@@ -1,78 +1,73 @@
 package com.yume.statusbarmonitor;
 
 import android.annotation.SuppressLint;
+import android.app.ActivityManager;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.os.BatteryManager;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
-import android.os.Bundle;
+import android.util.Log;
 
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 import androidx.core.graphics.drawable.IconCompat;
-
-import android.app.ActivityManager;
-import android.content.IntentFilter;
 
 import com.google.android.material.color.DynamicColors;
 
 public class MonitorService extends Service {
 
     private static final String CHANNEL_ID = "BatteryMonitorChannel";
-
     private NotificationManager notificationManager;
     private Handler handler;
     private Runnable updateTask;
-    // 存储用户设置
     private Bundle settings;
-
-    // 新增：可变更新频率
     private int updateInterval;
+    private Typeface customTypeface;
 
     @Override
     public void onCreate() {
         DynamicColors.applyToActivitiesIfAvailable(this.getApplication());
         super.onCreate();
-
         notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         createNotificationChannel();
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        // 从 Intent 中获取用户设置
-        settings = new Bundle();
-        settings.putString("data1", intent.getStringExtra("data1"));
-        settings.putString("data2", intent.getStringExtra("data2"));
-        settings.putInt("size", intent.getIntExtra("size", 32));
-        settings.putInt("offset", intent.getIntExtra("offset", 15));
-        settings.putInt("bitmapSize", intent.getIntExtra("bitmapSize", 64));
-        settings.putInt("padding_x", intent.getIntExtra("padding_x", -2));
-        // 新增：从 Intent 中获取更新频率，如果不存在则默认为 5000 毫秒（5秒）
-        updateInterval = intent.getIntExtra("interval", 3000);
-        // 新增左边距
-        settings.putInt("padding_x", intent.getIntExtra("padding_x", -2));
-        // 创建初始通知并启动前台服务
-        Notification initialNotification = createNotification(settings, "...","");
+        // 根据 intent 是否为空，判断服务是新启动还是被系统重启
+        if (intent != null && intent.getExtras() != null) {
+            // 从 MainActivity 启动
+            settings = intent.getExtras();
+        } else {
+            // 服务被系统重启
+            Log.d("MonitorService", "Service restarted by system, loading settings from SharedPreferences.");
+            settings = loadSettingsFromSharedPreferences();
+        }
+
+        updateInterval = settings.getInt("interval", 3000);
+        loadCustomFont(settings.getInt(Constants.KEY_FONT_CHOICE, 0));
+
+        Notification initialNotification = createNotification(settings, "...", "...");
         startForeground(1, initialNotification);
 
-        // 初始化 Handler 和 Runnable
         handler = new Handler(Looper.getMainLooper());
         updateTask = new Runnable() {
             @Override
             public void run() {
-                // 在这里获取所有数据
                 Intent batteryIntent = getApplicationContext().registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
                 int temperature = 0;
                 int voltage = 0;
@@ -87,31 +82,27 @@ public class MonitorService extends Service {
                 String memoryUsageMB = getMemoryUsageMB();
                 int memoryUsagePercent = getMemoryUsagePercent();
 
-                // 根据设置生成内容
-                String content1 = getDataValue(settings.getString("data1"), temperature, currentNow, voltage, percent, memoryUsageMB, memoryUsagePercent);
-                String content2 = getDataValue(settings.getString("data2"), temperature, currentNow, voltage, percent, memoryUsageMB, memoryUsagePercent);
-                String fullContent1 = getFullDataValue(settings.getString("data1"), temperature, currentNow, voltage, percent, memoryUsageMB, memoryUsagePercent);
-                String fullContent2 = getFullDataValue(settings.getString("data2"), temperature, currentNow, voltage, percent, memoryUsageMB, memoryUsagePercent);
+                String content1 = getDataValue(settings.getString(Constants.KEY_DATA1), temperature, currentNow, voltage, percent, memoryUsageMB, memoryUsagePercent);
+                String content2 = getDataValue(settings.getString(Constants.KEY_DATA2), temperature, currentNow, voltage, percent, memoryUsageMB, memoryUsagePercent);
+                String fullContent1 = getFullDataValue(settings.getString(Constants.KEY_DATA1), temperature, currentNow, voltage, percent, memoryUsageMB, memoryUsagePercent);
+                String fullContent2 = getFullDataValue(settings.getString(Constants.KEY_DATA2), temperature, currentNow, voltage, percent, memoryUsageMB, memoryUsagePercent);
 
                 String finalContent = content1;
-                if (!"none".equals(settings.getString("data2"))) {
+                if (!"none".equals(settings.getString(Constants.KEY_DATA2))) {
                     finalContent += "\t" + content2;
                 }
                 String finalFullContent = fullContent1;
-                if (!"none".equals(settings.getString("data2"))) {
+                if (!"none".equals(settings.getString(Constants.KEY_DATA2))) {
                     finalFullContent += "\t" + fullContent2;
                 }
 
-                // 更新通知
-                Notification updatedNotification = createNotification(settings, finalContent,finalFullContent);
+                Notification updatedNotification = createNotification(settings, finalContent, finalFullContent);
                 notificationManager.notify(1, updatedNotification);
 
-                // 再次发布任务，使用用户设置的频率
                 handler.postDelayed(this, updateInterval);
             }
         };
 
-        // 首次发布任务
         handler.post(updateTask);
 
         return START_STICKY;
@@ -132,27 +123,84 @@ public class MonitorService extends Service {
         return null;
     }
 
-    // 创建通知的方法， now uses Bundle for settings
+    private Bundle loadSettingsFromSharedPreferences() {
+        SharedPreferences sharedPrefs = getSharedPreferences(Constants.PREFS_NAME, MODE_PRIVATE);
+        Bundle loadedSettings = new Bundle();
+
+        // 从 SharedPreferences 加载数据
+        int data1Id = sharedPrefs.getInt(Constants.KEY_DATA1, R.id.rb_mem_p1);
+        int data2Id = sharedPrefs.getInt(Constants.KEY_DATA2, R.id.rb_watt2);
+
+        loadedSettings.putString(Constants.KEY_DATA1, getDataKey(data1Id));
+        loadedSettings.putString(Constants.KEY_DATA2, getDataKey(data2Id));
+
+        try {
+            loadedSettings.putInt(Constants.KEY_FONT_SIZE, Integer.parseInt(sharedPrefs.getString(Constants.KEY_FONT_SIZE, "32")));
+            loadedSettings.putInt(Constants.KEY_OFFSET, Integer.parseInt(sharedPrefs.getString(Constants.KEY_OFFSET, "15")));
+            loadedSettings.putInt(Constants.KEY_BITMAP_SIZE, Integer.parseInt(sharedPrefs.getString(Constants.KEY_BITMAP_SIZE, "64")));
+            loadedSettings.putInt(Constants.KEY_PADDING_X, Integer.parseInt(sharedPrefs.getString(Constants.KEY_PADDING_X, "-2")));
+        } catch (NumberFormatException e) {
+            Log.e("MonitorService", "Error parsing number from SharedPreferences, using defaults.", e);
+            loadedSettings.putInt(Constants.KEY_FONT_SIZE, 32);
+            loadedSettings.putInt(Constants.KEY_OFFSET, 15);
+            loadedSettings.putInt(Constants.KEY_BITMAP_SIZE, 64);
+            loadedSettings.putInt(Constants.KEY_PADDING_X, -2);
+        }
+
+        loadedSettings.putInt(Constants.KEY_REFRESH_RATE_POS, sharedPrefs.getInt(Constants.KEY_REFRESH_RATE_POS, 2));
+        loadedSettings.putInt(Constants.KEY_FONT_CHOICE, sharedPrefs.getInt(Constants.KEY_FONT_CHOICE, 0));
+
+        // 根据刷新位置计算间隔
+        int refreshRatePos = loadedSettings.getInt(Constants.KEY_REFRESH_RATE_POS);
+        int interval;
+        if (refreshRatePos == 0) { // 1s
+            interval = 1000;
+        } else if (refreshRatePos == 1) { // 2s
+            interval = 2000;
+        } else if (refreshRatePos == 2) { // 3s
+            interval = 3000;
+        } else if (refreshRatePos == 3) { // 4s
+            interval = 4000;
+        } else if (refreshRatePos == 4) { // 5s
+            interval = 5000;
+        } else {
+            interval = 3000; // 默认
+        }
+        loadedSettings.putInt("interval", interval);
+
+        return loadedSettings;
+    }
+
+    private void loadCustomFont(int fontChoicePosition) {
+        String fontFile = Constants.FONT_FILENAMES[fontChoicePosition];
+        if (fontFile != null) {
+            try {
+                customTypeface = Typeface.createFromAsset(getAssets(), fontFile);
+            } catch (Exception e) {
+                Log.e("MonitorService", "Can't load font: " + fontFile, e);
+                customTypeface = Typeface.DEFAULT_BOLD;
+            }
+        } else {
+            customTypeface = Typeface.DEFAULT_BOLD;
+        }
+    }
+
     private Notification createNotification(Bundle settings, String content, String fullContent) {
-        int bitmapSize = settings.getInt("bitmapSize");
+        int bitmapSize = settings.getInt(Constants.KEY_BITMAP_SIZE);
         Bitmap bitmap = Bitmap.createBitmap(bitmapSize, bitmapSize, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
         canvas.drawColor(Color.TRANSPARENT);
 
         String[] lines = content.split("\t");
-        int fontSize = settings.getInt("size");
-        int offset = settings.getInt("offset");
-        int paddingX = settings.getInt("padding_x");
+        int fontSize = settings.getInt(Constants.KEY_FONT_SIZE);
+        int offset = settings.getInt(Constants.KEY_OFFSET);
+        int paddingX = settings.getInt(Constants.KEY_PADDING_X);
 
         Paint paint = new Paint();
         paint.setColor(Color.WHITE);
         paint.setTextSize(fontSize);
-        paint.setTypeface(Typeface.DEFAULT_BOLD);
-
-
-        // 设置为左对齐
+        paint.setTypeface(customTypeface);
         paint.setTextAlign(Paint.Align.LEFT);
-
 
         float centerY = (bitmap.getHeight() / 2f) - (paint.descent() + paint.ascent()) / 2;
         if (lines.length > 0) {
@@ -161,13 +209,6 @@ public class MonitorService extends Service {
         if (lines.length > 1) {
             canvas.drawText(lines[1], paddingX, centerY + offset, paint);
         }
-        // 中间对齐
-//        if (lines.length > 0) {
-//            canvas.drawText(lines[0], bitmap.getWidth() / 2f, (bitmap.getHeight() / 2f) - (paint.descent() + paint.ascent()) / 2 - offset, paint);
-//        }
-//        if (lines.length > 1) {
-//            canvas.drawText(lines[1], bitmap.getWidth() / 2f, (bitmap.getHeight() / 2f) - (paint.descent() + paint.ascent()) / 2 + offset, paint);
-//        }
 
         IconCompat icon = IconCompat.createWithBitmap(bitmap);
 
@@ -177,7 +218,7 @@ public class MonitorService extends Service {
                 .build();
     }
 
-    // 修改 getDataValue 方法，增加对新内存百分比的支持
+    // ... (保持 getDataValue, getFullDataValue, getBatteryCurrentNow, getMemoryUsageMB, getMemoryUsagePercent, createNotificationChannel 等方法不变)
     @SuppressLint("DefaultLocale")
     private String getDataValue(String key, int temp, long current, int voltage, int percent, String memMB, int memPercent) {
         switch (key) {
@@ -209,7 +250,17 @@ public class MonitorService extends Service {
         }
     }
 
-    // 获取电流的方法
+    private String getDataKey(int radioButtonId) {
+        if (radioButtonId == R.id.rb_temp1 || radioButtonId == R.id.rb_temp2) return "temperature";
+        if (radioButtonId == R.id.rb_current1 || radioButtonId == R.id.rb_current2) return "current";
+        if (radioButtonId == R.id.rb_voltage1 || radioButtonId == R.id.rb_voltage2) return "voltage";
+        if (radioButtonId == R.id.rb_watt1 || radioButtonId == R.id.rb_watt2) return "watt";
+        if (radioButtonId == R.id.rb_percent1 || radioButtonId == R.id.rb_percent2) return "percent";
+        if (radioButtonId == R.id.rb_mem_p1 || radioButtonId == R.id.rb_mem_p2) return "memory_percent";
+        if (radioButtonId == R.id.rb_none1 || radioButtonId == R.id.rb_none2) return "none";
+        return "none";
+    }
+
     private long getBatteryCurrentNow() {
         BatteryManager batteryManager = (BatteryManager) getSystemService(Context.BATTERY_SERVICE);
         if (batteryManager != null) {
@@ -227,7 +278,7 @@ public class MonitorService extends Service {
         long usedMemory = totalMemory - availableMemory;
         return usedMemory + "M/" + totalMemory + "M";
     }
-    // 增加一个获取内存使用百分比的方法
+
     private int getMemoryUsagePercent() {
         ActivityManager activityManager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
         ActivityManager.MemoryInfo memoryInfo = new ActivityManager.MemoryInfo();
