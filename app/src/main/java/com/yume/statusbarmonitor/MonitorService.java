@@ -223,7 +223,7 @@ public class MonitorService extends Service {
     private String getDataValue(String key, int temp, long current, int voltage, int percent, String memMB, int memPercent) {
         switch (key) {
             case "temperature": return temp + "°";
-            case "current": return (current / 1000) + "";
+            case "current": return current<0?(current / -1000)+"":(current / 1000)+"";
             case "voltage": return String.format("%.1fⱽ", (voltage / 1000f));
             case "percent": return percent + "%" ;
             case "memory_mb": return memMB;
