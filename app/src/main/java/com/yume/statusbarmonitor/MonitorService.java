@@ -227,15 +227,10 @@ public class MonitorService extends Service {
         switch (key) {
             case "temperature": return temp + "°";
             case "current": return Math.abs(current)+"";
-            case "voltage":
-                if(voltage==3||voltage==4){
-                    return voltage+"";
-                }else {
-                    return String.format("%.1f", (voltage / 1000f));
-                }
+            case "voltage": return String.format("%.1f", (voltage / 1000f));
             case "percent": return percent + "%" ;
             case "memory_mb": return memMB;
-            case "memory_percent": return "ᔿ"+memPercent ;
+            case "memory_percent": return memPercent + "%" ;
             case "watt":
                 double watts = (Math.abs(current) * voltage) / (double)wDivisor;
                 return String.format("%.1f", watts);
@@ -247,12 +242,7 @@ public class MonitorService extends Service {
         switch (key) {
             case "temperature": return "Temperature:" + temp + "°C";
             case "current": return "Current:" + (current / 1000) + "mA";
-            case "voltage":
-                if(voltage==3||voltage==4){
-                    return "Voltage:" + voltage + "V";
-                }else {
-                    return "Voltage:" + (voltage / 1000f) + "V";
-                }
+            case "voltage": return "Voltage:" + (voltage / 1000f) + "V";
             case "percent": return "Battery:" + percent + "%";
             case "memory_mb": return "Memory:" + memMB;
             case "memory_percent": return "MemoryUsage:" + memPercent + "%";
