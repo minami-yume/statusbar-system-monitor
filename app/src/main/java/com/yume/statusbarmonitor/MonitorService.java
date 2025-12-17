@@ -446,9 +446,9 @@ public class MonitorService extends Service {
         loadedSettings.putString(Constants.KEY_DIVISOR, sharedPrefs.getString(Constants.KEY_DIVISOR, "1000000000"));
 
         // 加载 Spinner 索引并转换为 Key
-        int idx1 = sharedPrefs.getInt("data1_index", 2);
-        int idx2 = sharedPrefs.getInt("data2_index", 6);
-        int idxRing = sharedPrefs.getInt("ring_index", 1);
+        int idx1 = sharedPrefs.getInt("pref_idx_data1_v2", 1);
+        int idx2 = sharedPrefs.getInt("pref_idx_data2_v2", 0);
+        int idxRing = sharedPrefs.getInt("pref_idx_ring_v2", 2);
 
         String[] dataValues = getResources().getStringArray(R.array.data_values);
         String[] ringValues = getResources().getStringArray(R.array.ring_values);
