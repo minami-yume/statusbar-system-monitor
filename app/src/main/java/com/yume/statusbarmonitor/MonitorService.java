@@ -214,8 +214,8 @@ public class MonitorService extends Service {
             case "watt":
                 double watts = (Math.abs(current) * voltage) / (double) wDivisor;
                 return String.format("%.1f", watts);
-            case "download_speed": return "↓" + formatSpeedShort(downSpeed);
-            case "upload_speed": return "↑" + formatSpeedShort(upSpeed);
+            case "download_speed": return formatSpeedShort(downSpeed) + "↓";
+            case "upload_speed": return formatSpeedShort(upSpeed) + "↑";
             case "storage_free": return String.format("%.1f",storageUsageFree);
             default: return "";
         }
