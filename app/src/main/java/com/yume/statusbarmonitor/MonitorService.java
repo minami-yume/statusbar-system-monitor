@@ -148,6 +148,9 @@ public class MonitorService extends Service {
                     case "storage_percent":
                         progressPercent = storageUsagePercent;
                         break;
+                    case "temperature":
+                        progressPercent = temperature * 2;
+                        break;
                     default:
                         progressPercent = -1;
                         break;
@@ -194,7 +197,7 @@ public class MonitorService extends Service {
 
         sb.append("功率: ").append(String.format("%.2fW", watts)).append("  ");
         sb.append("电压: ").append(String.format("%.2fV", voltage / 1000f)).append("  ");
-        sb.append("电流: ").append(current).append("mA\n");
+        sb.append("电流: ").append(current).append("\n");
 
         sb.append("内存: ").append(memMB).append(" (").append(memPercent).append("%)\n");
         sb.append("存储: ").append(storagePercent).append("% 已用 ").append(String.format("%.2f",storageUsageFree)).append("GiB 空闲\n");

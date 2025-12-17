@@ -18,7 +18,7 @@
         <item>功耗 (W)</item>
         <item>电池温度</item>
         <item>内存占用</item>
-        <item>电流 (mA)</item>
+        <item>电流</item>
         <item>电压 (V)</item>
         <item>电量</item>
         <item>上传</item>
@@ -46,6 +46,7 @@
         <item>电量百分比</item>
         <item>内存占用</item>
         <item>存储占用</item>
+        <item>电池温度(满圈为50°C)</item>
     </string-array>
 
     <string-array name="ring_values">
@@ -53,5 +54,6 @@
         <item>battery_percent</item>
         <item>memory_percent</item>
         <item>storage_percent</item>
+        <item>temperature</item>
     </string-array>
 </resources>
