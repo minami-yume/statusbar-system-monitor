@@ -11,10 +11,12 @@
         android:id="@+id/statusText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="点击按钮启动服务"
+        android:layout_marginTop="50dp"
+        android:text="状态监视器"
         android:textSize="18sp"
-        app:layout_constraintBottom_toTopOf="@+id/linearLayout"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -23,122 +25,73 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:layout_marginTop="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toBottomOf="@+id/statusText"
+        app:layout_constraintVertical_bias="0.1">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="选择第一行显示的信息"
-            android:textStyle="bold"
-            android:textColor="?attr/colorOnSurface"/>
-
-        <HorizontalScrollView
+            android:text="第一行显示:"
+            android:textStyle="bold" />
+        <Spinner
+            android:id="@+id/spinner_data1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:scrollbars="horizontal">
-
-            <RadioGroup
-                android:id="@+id/radioGroup1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <com.google.android.material.radiobutton.MaterialRadioButton
-                    android:id="@+id/rb_watt1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="功耗" />
-
-                <com.google.android.material.radiobutton.MaterialRadioButton android:id="@+id/rb_temp1" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="电池温度" />
-
-                <com.google.android.material.radiobutton.MaterialRadioButton
-                    android:id="@+id/rb_mem_p1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:checked="true"
-                    android:text="内存占用" />
-
-                <com.google.android.material.radiobutton.MaterialRadioButton android:id="@+id/rb_current1" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="电流" />
-                <com.google.android.material.radiobutton.MaterialRadioButton android:id="@+id/rb_voltage1" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="电压" />
-
-                <com.google.android.material.radiobutton.MaterialRadioButton android:id="@+id/rb_percent1" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="电量" />
-
-                <com.google.android.material.radiobutton.MaterialRadioButton android:id="@+id/rb_none1" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="无" />
-            </RadioGroup>
-        </HorizontalScrollView>
+            android:minHeight="48dp"
+            android:entries="@array/data_labels" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="选择第二行显示的信息"
-            android:textStyle="bold"
-            android:textColor="?attr/colorOnSurface"/>
-
-        <HorizontalScrollView
+            android:layout_marginTop="10dp"
+            android:text="第二行显示:"
+            android:textStyle="bold" />
+        <Spinner
+            android:id="@+id/spinner_data2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:scrollbars="horizontal">
-
-            <RadioGroup
-                android:id="@+id/radioGroup2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <com.google.android.material.radiobutton.MaterialRadioButton
-                    android:id="@+id/rb_watt2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:checked="true"
-                    android:text="功耗" />
-
-                <com.google.android.material.radiobutton.MaterialRadioButton android:id="@+id/rb_temp2" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="电池温度" />
-
-                <com.google.android.material.radiobutton.MaterialRadioButton
-                    android:id="@+id/rb_mem_p2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="内存占用" />
-
-                <com.google.android.material.radiobutton.MaterialRadioButton android:id="@+id/rb_current2" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="电流" />
-                <com.google.android.material.radiobutton.MaterialRadioButton android:id="@+id/rb_voltage2" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="电压" />
-
-                <com.google.android.material.radiobutton.MaterialRadioButton android:id="@+id/rb_percent2" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="电量" />
-
-                <com.google.android.material.radiobutton.MaterialRadioButton android:id="@+id/rb_none2" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="无" />
-            </RadioGroup>
-        </HorizontalScrollView>
-
+            android:minHeight="48dp"
+            android:entries="@array/data_labels" />
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="刷新间隔(受限于系统不一定准时)"
-            android:textStyle="normal"
-            android:textColor="?attr/colorOnSurface"/>
+            android:layout_marginTop="10dp"
+            android:text="圆环显示 (其实是方的):"
+            android:textStyle="bold" />
+
         <Spinner
-            android:id="@+id/refresh_rate_spinner"
-            android:layout_width="wrap_content"
+            android:id="@+id/spinner_ring"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:entries="@array/refresh_rates" />
-        <TextView
-            android:layout_width="wrap_content"
+            android:minHeight="48dp"
+            android:entries="@array/ring_labels" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="选择字体,窄体更合适单行显示"
-            android:textStyle="normal"
-            android:textColor="?attr/colorOnSurface"/>
-        <Spinner
-            android:id="@+id/font_spinner"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:entries="@array/font_options" />
+            android:layout_marginTop="16dp"
+            android:orientation="horizontal">
+
+            <LinearLayout android:orientation="vertical" android:layout_weight="1" android:layout_width="0dp" android:layout_height="wrap_content">
+                <TextView android:text="刷新率" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                <Spinner android:id="@+id/refresh_rate_spinner" android:layout_width="match_parent" android:layout_height="48dp" android:entries="@array/refresh_rates" />
+            </LinearLayout>
+
+            <LinearLayout android:orientation="vertical" android:layout_weight="1" android:layout_width="0dp" android:layout_height="wrap_content">
+                <TextView android:text="字体" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+                <Spinner android:id="@+id/font_spinner" android:layout_width="match_parent" android:layout_height="48dp" android:entries="@array/font_options" />
+            </LinearLayout>
+        </LinearLayout>
+
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:hint="字体大小"
+            android:hint="字体大小 (32)"
             style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/et_size1"
@@ -148,37 +101,28 @@
                 android:text="32" />
         </com.google.android.material.textfield.TextInputLayout>
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_weight="1" android:layout_width="0dp" android:layout_height="wrap_content" android:hint="行间距" style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
+                <com.google.android.material.textfield.TextInputEditText android:id="@+id/et_offset1" android:inputType="number" android:text="15" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <Space android:layout_width="8dp" android:layout_height="wrap_content"/>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_weight="1" android:layout_width="0dp" android:layout_height="wrap_content" android:hint="左边距" style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
+                <com.google.android.material.textfield.TextInputEditText android:id="@+id/et_padding" android:inputType="numberSigned" android:text="-2" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+            </com.google.android.material.textfield.TextInputLayout>
+        </LinearLayout>
+
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:hint="行间距"
-            style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/et_offset1"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="number"
-                android:text="15" />
-        </com.google.android.material.textfield.TextInputLayout>
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:hint="左边距"
-            style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/et_padding"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="numberSigned"
-                android:text="-2" />
-        </com.google.android.material.textfield.TextInputLayout>
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:hint="图标尺寸"
+            android:hint="图标尺寸 (64)"
             style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/et_bitmap_size"
@@ -187,11 +131,12 @@
                 android:inputType="number"
                 android:text="64" />
         </com.google.android.material.textfield.TextInputLayout>
+
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:hint="功耗除以"
+            android:hint="功耗除数 (1000000000)"
             style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/et_divisor"

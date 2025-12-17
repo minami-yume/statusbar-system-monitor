@@ -7,8 +7,51 @@
         <item>4s</item>
         <item>5s</item>
     </string-array>
+
     <string-array name="font_options">
         <item>默认</item>
         <item>窄体</item>
+    </string-array>
+
+    <string-array name="data_labels">
+        <item>无</item>
+        <item>功耗 (Watt)</item>
+        <item>电池温度</item>
+        <item>内存占用</item>
+        <item>电流 (mA)</item>
+        <item>电压 (V)</item>
+        <item>电量百分比</item>
+        <item>网速 (下载)</item>
+        <item>网速 (上传)</item>
+        <item>存储空间占用</item>
+        <item>存储空间可用</item>
+    </string-array>
+
+    <string-array name="data_values">
+        <item>none</item>
+        <item>watt</item>
+        <item>temperature</item>
+        <item>memory_percent</item>
+        <item>current</item>
+        <item>voltage</item>
+        <item>percent</item>
+        <item>download_speed</item>
+        <item>upload_speed</item>
+        <item>storage_percent</item>
+        <item>storage_free</item>
+    </string-array>
+
+    <string-array name="ring_labels">
+        <item>无圆环</item>
+        <item>电量百分比</item>
+        <item>内存占用</item>
+        <item>存储空间占用</item>
+    </string-array>
+
+    <string-array name="ring_values">
+        <item>none</item>
+        <item>battery_percent</item>
+        <item>memory_percent</item>
+        <item>storage_percent</item>
     </string-array>
 </resources>
