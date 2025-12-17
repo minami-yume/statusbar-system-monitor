@@ -23,6 +23,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
+import android.os.StatFs;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
@@ -40,6 +41,16 @@ public class MonitorService extends Service {
     private Bundle settings;
     private int updateInterval;
     private Typeface customTypeface;
+
+    private long lastTime=0;
+    private long lastRxBytes=0;
+    private long lastTxBytes=0;
+    private long DownloadSpeed=0;
+    private long UploadSpeed=0;
+
+    private String Key1="";
+    private String Key2="";
+    private String KeyRing="";
 
     @Override
     public void onCreate() {
@@ -85,24 +96,31 @@ public class MonitorService extends Service {
                 String memoryUsageMB = getMemoryUsageMB();
                 int memoryUsagePercent = getMemoryUsagePercent();
                 int wattsDivisor=settings.getInt(Constants.KEY_DIVISOR);
+                int storageUsagePercent=getStorageUsagePercent();
+                updateNetworkSpeed();
+                Key1=settings.getString(Constants.KEY_DATA1);
+                Key2=settings.getString(Constants.KEY_DATA2);
 
-                String content1 = getDataValue(settings.getString(Constants.KEY_DATA1), temperature, currentNow, voltage, percent, memoryUsageMB, memoryUsagePercent,wattsDivisor);
-                String content2 = getDataValue(settings.getString(Constants.KEY_DATA2), temperature, currentNow, voltage, percent, memoryUsageMB, memoryUsagePercent,wattsDivisor);
-                String fullContent1 = getFullDataValue(settings.getString(Constants.KEY_DATA1), temperature, currentNow, voltage, percent, memoryUsageMB, memoryUsagePercent,wattsDivisor);
-                String fullContent2 = getFullDataValue(settings.getString(Constants.KEY_DATA2), temperature, currentNow, voltage, percent, memoryUsageMB, memoryUsagePercent,wattsDivisor);
+                String content1 = getDataValue(Key1, temperature, currentNow, voltage, percent, memoryUsageMB, memoryUsagePercent,wattsDivisor,DownloadSpeed,UploadSpeed,storageUsagePercent);
+                String content2 = getDataValue(Key2, temperature, currentNow, voltage, percent, memoryUsageMB, memoryUsagePercent,wattsDivisor,DownloadSpeed,UploadSpeed,storageUsagePercent);
+                String fullContent1 = getFullDataValue(Key1, temperature, currentNow, voltage, percent, memoryUsageMB, memoryUsagePercent,wattsDivisor,DownloadSpeed,UploadSpeed,storageUsagePercent);
+                String fullContent2 = getFullDataValue(Key2, temperature, currentNow, voltage, percent, memoryUsageMB, memoryUsagePercent,wattsDivisor,DownloadSpeed,UploadSpeed,storageUsagePercent);
 
                 String finalContent = content1;
-                if (!"none".equals(settings.getString(Constants.KEY_DATA2))) {
+                if (!"none".equals(Key2)) {
                     finalContent += "\t" + content2;
                 }
                 String finalFullContent = fullContent1;
-                if (!"none".equals(settings.getString(Constants.KEY_DATA2))) {
+                if (!"none".equals(Key2)) {
                     finalFullContent += "\t" + fullContent2;
                 }
 
-                int progressValue=memoryUsagePercent;
+                int progressPercent=-1;
+                switch (KeyRing){
+                    default: break;
+                }
 
-                Notification updatedNotification = createNotification(settings, finalContent, finalFullContent,progressValue);
+                Notification updatedNotification = createNotification(settings, finalContent, finalFullContent,progressPercent);
                 notificationManager.notify(1, updatedNotification);
 
                 handler.postDelayed(this, updateInterval);
@@ -213,6 +231,8 @@ public class MonitorService extends Service {
         android.graphics.RectF rect = new RectF(0,0,bitmapSize,bitmapSize);
 
         if(progress>0){
+            if(progress>=100)progress=100;
+
             strokePaint.setColor(Color.WHITE);
 
             android.graphics.Path path=new Path();
@@ -264,7 +284,7 @@ public class MonitorService extends Service {
 
     // ... (保持 getDataValue, getFullDataValue, getBatteryCurrentNow, getMemoryUsageMB, getMemoryUsagePercent, createNotificationChannel 等方法不变)
     @SuppressLint("DefaultLocale")
-    private String getDataValue(String key, int temp, long current, int voltage, int percent, String memMB, int memPercent, int wDivisor) {
+    private String getDataValue(String key, int temp, long current, int voltage, int percent, String memMB, int memPercent, int wDivisor,long downloadSpeed,long uploadSpeed,int storageUsagePercent) {
         switch (key) {
             case "temperature": return temp + "°";
             case "current": return Math.abs(current)+"";
@@ -275,11 +295,24 @@ public class MonitorService extends Service {
             case "watt":
                 double watts = (Math.abs(current) * voltage) / (double)wDivisor;
                 return String.format("%.1f", watts);
+            case "downloadSpeed":
+                if(downloadSpeed>=1024*1024){
+                    return String.format("↓%.1fM",downloadSpeed/1024f/1024f);
+                }else {
+                    return "↓"+(downloadSpeed/1024)+"K";
+                }
+            case "uploadSpeed":
+                if(uploadSpeed>=1024*1024){
+                    return String.format("↑%.1fM",uploadSpeed/1024f/1024f);
+                }else {
+                    return "↑"+(uploadSpeed/1024)+"K";
+                }
+            case "storageUsagePercent": return storageUsagePercent+"%";
             default: return "";
         }
     }
     @SuppressLint("DefaultLocale")
-    private String getFullDataValue(String key, int temp, long current, int voltage, int percent, String memMB, int memPercent, int wDivisor) {
+    private String getFullDataValue(String key, int temp, long current, int voltage, int percent, String memMB, int memPercent, int wDivisor,long downloadSpeed,long uploadSpeed,int storageUsagePercent) {
         switch (key) {
             case "temperature": return "Temperature:" + temp + "°C";
             case "current": return "Current:" + (current / 1000) + "mA";
@@ -290,6 +323,19 @@ public class MonitorService extends Service {
             case "watt":
                 double watts = (current * voltage) / (double)wDivisor;
                 return "Watts:"+String.format("%.3fW", watts);
+            case "downloadSpeed":
+                if(downloadSpeed>=1024*1024){
+                    return String.format("↓%.1fM",downloadSpeed/1024f/1024f);
+                }else {
+                    return "↓"+(downloadSpeed/1024)+"K";
+                }
+            case "uploadSpeed":
+                if(uploadSpeed>=1024*1024){
+                    return String.format("↑%.1fM",uploadSpeed/1024f/1024f);
+                }else {
+                    return "↑"+(uploadSpeed/1024)+"K";
+                }
+            case "storageUsagePercent": return "StorageUsage:"+storageUsagePercent+"%";
             default: return "";
         }
     }
@@ -342,4 +388,56 @@ public class MonitorService extends Service {
         notificationManager.createNotificationChannel(channel);
     }
 
+    private void updateNetworkSpeed(){
+        long now=System.currentTimeMillis();
+        long rxBytes=android.net.TrafficStats.getTotalRxBytes();
+        long txBytes=android.net.TrafficStats.getTotalTxBytes();
+
+        if(lastTime!=0){
+            long timeDelta=now-lastTime;
+            if(timeDelta>0){
+                long rxBytesDelta=rxBytes-lastRxBytes;
+                long txBytesDelta=txBytes-lastTxBytes;
+//                DownloadSpeed=formatNetworkSpeed(rxBytesDelta*1000/timeDelta);// rx/(ms/1000)
+                DownloadSpeed=(rxBytesDelta*1000/timeDelta);
+                UploadSpeed=(txBytesDelta*1000/timeDelta);
+            }
+        }
+        lastRxBytes=rxBytes;
+        lastTxBytes=txBytes;
+        lastTime=now;
+    }
+    private int getStorageUsagePercent(){
+        long[] usage=getStorageUsage();
+        long total=usage[0];
+        long free=usage[1];
+        long used=usage[2];
+
+        if (total>0){
+            return (int)((used/total)*100);
+        }else {
+            return 0;
+        }
+    }
+    private long[] getStorageUsage(){
+        long[] usage=new long[]{0L,0L,0L};
+        try{
+            java.io.File path=android.os.Environment.getDataDirectory();
+            android.os.StatFs stat=new StatFs(path.getPath());
+            long blockSize=stat.getBlockSizeLong();
+            long totoalBlocks=stat.getBlockCountLong();
+            long availableBlocks=stat.getAvailableBlocksLong();
+
+            long total=totoalBlocks*blockSize;
+            long free=availableBlocks*blockSize;
+            long used=total-free;
+
+            usage[0]=total;
+            usage[1]=free;
+            usage[2]=used;
+        }catch (Exception e){
+            Log.e("MonitorService", "getStorageUsage io exception", e);
+        }
+        return usage;
+    }
 }
