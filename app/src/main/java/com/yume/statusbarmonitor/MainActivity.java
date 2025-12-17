@@ -169,7 +169,7 @@ public class MainActivity extends AppCompatActivity {
 
 
             startForegroundService(serviceIntent);
-            statusText.setText("服务已启动: " + key1 + " & " + key2 + " & " + keyRing);
+            statusText.setText("服务已启动: \n" + key1 + " & " + key2 + " & " + keyRing);
 
         } catch (NumberFormatException e) {
             Toast.makeText(this, "参数错误：请输入有效的数字", Toast.LENGTH_SHORT).show();

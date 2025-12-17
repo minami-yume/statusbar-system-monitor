@@ -106,14 +106,14 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
             <com.google.android.material.textfield.TextInputLayout
-                android:layout_weight="1" android:layout_width="0dp" android:layout_height="wrap_content" android:hint="行间距" style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
+                android:layout_weight="1" android:layout_width="0dp" android:layout_height="wrap_content" android:hint="行间距(15)" style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
                 <com.google.android.material.textfield.TextInputEditText android:id="@+id/et_offset1" android:inputType="number" android:text="15" android:layout_width="match_parent" android:layout_height="wrap_content"/>
             </com.google.android.material.textfield.TextInputLayout>
 
             <Space android:layout_width="8dp" android:layout_height="wrap_content"/>
 
             <com.google.android.material.textfield.TextInputLayout
-                android:layout_weight="1" android:layout_width="0dp" android:layout_height="wrap_content" android:hint="左边距" style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
+                android:layout_weight="1" android:layout_width="0dp" android:layout_height="wrap_content" android:hint="左边距(-2)" style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
                 <com.google.android.material.textfield.TextInputEditText android:id="@+id/et_padding" android:inputType="numberSigned" android:text="-2" android:layout_width="match_parent" android:layout_height="wrap_content"/>
             </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
@@ -136,7 +136,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:hint="功耗除数 (1000000000)"
+            android:hint="功耗除数 (因机型而异)"
             style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/et_divisor"

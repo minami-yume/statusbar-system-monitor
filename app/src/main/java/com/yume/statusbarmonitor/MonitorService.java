@@ -121,12 +121,16 @@ public class MonitorService extends Service {
                 }
 
                 // 标题文字（Notification Title）
-                String titleContent = "Value: " + key1;
+                String label1 = getLabelFromKey(key1);
+                String label2 = getLabelFromKey(key2);
+
+                String titleContent = "数: " + label1;
                 if (!"none".equals(key2)) {
-                    titleContent += " | " + key2;
+                    titleContent += " | " + label2;
                 }
-                if(!"none".equals(keyRing)){
-                    titleContent += " Ring: " + keyRing;
+                if (!"none".equals(keyRing)) {
+                    String ringLabel = getLabelFromKey(keyRing);
+                    titleContent += " 环: " + ringLabel;
                 }
 
                 // 全部信息文字（Notification Expanded Body）
@@ -502,5 +506,30 @@ public class MonitorService extends Service {
         } else {
             customTypeface = Typeface.DEFAULT_BOLD;
         }
+    }
+    /**
+     * 根据英文 Key (如 "watt") 获取对应的中文 Label (如 "功耗 (Watt)")
+     */
+    private String getLabelFromKey(String key) {
+        if ("none".equals(key) || key == null || key.isEmpty()) {
+            return "无";
+        }
+
+        try {
+            // 获取两个数组
+            String[] values = getResources().getStringArray(R.array.data_values);
+            String[] labels = getResources().getStringArray(R.array.data_labels);
+
+            // 遍历英文数组找索引
+            for (int i = 0; i < values.length; i++) {
+                if (values[i].equals(key)) {
+                    // 返回相同位置的中文
+                    return labels[i];
+                }
+            }
+        } catch (Exception e) {
+            Log.e("MonitorService", "Error mapping key to label", e);
+        }
+        return key; // 找不到则返回原 Key 兜底
     }
 }
