@@ -14,6 +14,9 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Path;
+import android.graphics.PathMeasure;
+import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.os.BatteryManager;
 import android.os.Bundle;
@@ -61,7 +64,7 @@ public class MonitorService extends Service {
         updateInterval = settings.getInt("interval", 3000);
         loadCustomFont(settings.getInt(Constants.KEY_FONT_CHOICE, 0));
 
-        Notification initialNotification = createNotification(settings, "...", "...");
+        Notification initialNotification = createNotification(settings, "...", "...",0);
         startForeground(1, initialNotification);
 
         handler = new Handler(Looper.getMainLooper());
@@ -97,7 +100,9 @@ public class MonitorService extends Service {
                     finalFullContent += "\t" + fullContent2;
                 }
 
-                Notification updatedNotification = createNotification(settings, finalContent, finalFullContent);
+                int progressValue=memoryUsagePercent;
+
+                Notification updatedNotification = createNotification(settings, finalContent, finalFullContent,progressValue);
                 notificationManager.notify(1, updatedNotification);
 
                 handler.postDelayed(this, updateInterval);
@@ -188,11 +193,42 @@ public class MonitorService extends Service {
         }
     }
 
-    private Notification createNotification(Bundle settings, String content, String fullContent) {
+    private Notification createNotification(Bundle settings, String content, String fullContent, int progress) {
         int bitmapSize = settings.getInt(Constants.KEY_BITMAP_SIZE);
+        //创建画布
         Bitmap bitmap = Bitmap.createBitmap(bitmapSize, bitmapSize, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
         canvas.drawColor(Color.TRANSPARENT);
+
+        Paint strokePaint = new Paint();
+        strokePaint.setAntiAlias(true);
+        strokePaint.setStyle(Paint.Style.STROKE);
+
+        float strokeWidth = bitmapSize / 10f;
+        strokePaint.setStrokeWidth(strokeWidth);
+        strokePaint.setStrokeCap(Paint.Cap.SQUARE);
+
+        float inset = strokeWidth / 4;
+        //android.graphics.RectF rect = new RectF(inset,inset,bitmapSize-inset,bitmapSize-inset);
+        android.graphics.RectF rect = new RectF(0,0,bitmapSize,bitmapSize);
+
+        if(progress>0){
+            strokePaint.setColor(Color.WHITE);
+
+            android.graphics.Path path=new Path();
+            path.addRect(rect,Path.Direction.CW);
+
+            PathMeasure measure=new PathMeasure(path,false);
+            float length=measure.getLength();
+
+            Path partialPath = new Path();
+            measure.getSegment(0,length*(progress/100f),partialPath,true);
+
+            canvas.drawPath(partialPath,strokePaint);
+        }
+
+
+
 
         String[] lines = content.split("\t");
         int fontSize = settings.getInt(Constants.KEY_FONT_SIZE);
@@ -218,6 +254,11 @@ public class MonitorService extends Service {
         return new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setContentTitle(fullContent.replace("\t", ", "))
                 .setSmallIcon(icon)
+
+                .setOnlyAlertOnce(true)
+                .setOngoing(true)
+                .setForegroundServiceBehavior(NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE)
+
                 .build();
     }
 
@@ -300,4 +341,5 @@ public class MonitorService extends Service {
         channel.setVibrationPattern(new long[]{0});
         notificationManager.createNotificationChannel(channel);
     }
+
 }
