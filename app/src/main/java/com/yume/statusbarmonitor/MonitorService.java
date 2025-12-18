@@ -273,9 +273,9 @@ public class MonitorService extends Service {
         strokePaint.setAntiAlias(true);
         strokePaint.setStyle(Paint.Style.STROKE);
 
-        float strokeWidth = bitmapSize / 8f;
+        float strokeWidth = bitmapSize / 10f;
         strokePaint.setStrokeWidth(strokeWidth);
-        strokePaint.setStrokeCap(Paint.Cap.SQUARE);
+        strokePaint.setStrokeCap(Paint.Cap.BUTT);
 
         // 稍微内缩一点防止边缘被切
         // float inset = strokeWidth / 2;
