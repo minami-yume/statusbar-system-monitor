@@ -11,11 +11,12 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.color.DynamicColors;
+import com.google.android.material.materialswitch.MaterialSwitch;
 import com.google.android.material.textfield.TextInputEditText;
 
 public class MainActivity extends AppCompatActivity {
 
-    private TextInputEditText etSize1, etOffset1, etPadding, etBitmapSize, etDivisor, etPaddingY;
+    private TextInputEditText etSize1, etOffset1, etPadding, etBitmapSize, etDivisor, etPaddingY, etDashLength,etDashGap;
     private Spinner spinnerData1, spinnerData2; // 使用 Spinner 替代 RadioGroup
     private Spinner refreshRateSpinner, fontSpinner;
     private TextView statusText;
@@ -33,6 +34,8 @@ public class MainActivity extends AppCompatActivity {
 
     // 增加圆环的存储 Key
     private static final String PREF_KEY_IDX_RING = "pref_idx_ring_v2";
+
+    private MaterialSwitch switchDashed;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +67,10 @@ public class MainActivity extends AppCompatActivity {
 
         Button startButton = findViewById(R.id.startButton);
         Button stopButton = findViewById(R.id.stopButton);
+
+        switchDashed = findViewById(R.id.switch_dashed_ring);
+        etDashLength = findViewById(R.id.et_dash_length);
+        etDashGap = findViewById(R.id.et_dash_gap);
 
         loadSettings();
 
@@ -104,6 +111,10 @@ public class MainActivity extends AppCompatActivity {
         editor.putInt(PREF_KEY_IDX_1, spinnerData1.getSelectedItemPosition());
         editor.putInt(PREF_KEY_IDX_2, spinnerData2.getSelectedItemPosition());
 
+        editor.putBoolean(Constants.KEY_RING_DASHED, switchDashed.isChecked());
+        editor.putString(Constants.KEY_DASH_LENGTH, etDashLength.getText().toString());
+        editor.putString(Constants.KEY_DASH_GAP, etDashGap.getText().toString());
+
         editor.apply();
     }
 
@@ -117,6 +128,8 @@ public class MainActivity extends AppCompatActivity {
         setSafeText(etPadding, prefs, Constants.KEY_PADDING_X, "-2");
         setSafeText(etPaddingY, prefs, Constants.KEY_PADDING_Y, "0");
         setSafeText(etDivisor, prefs, Constants.KEY_DIVISOR, "1000000000");
+        setSafeText(etDashLength, prefs, Constants.KEY_DASH_LENGTH, "6");
+        setSafeText(etDashGap, prefs, Constants.KEY_DASH_GAP, "2");
 
         refreshRateSpinner.setSelection(prefs.getInt(Constants.KEY_REFRESH_RATE_POS, 2));
         fontSpinner.setSelection(prefs.getInt(Constants.KEY_FONT_CHOICE, 0));
@@ -126,6 +139,8 @@ public class MainActivity extends AppCompatActivity {
         spinnerData2.setSelection(prefs.getInt(PREF_KEY_IDX_2, 3)); // 默认 Memory
 
         spinnerRing.setSelection(prefs.getInt(PREF_KEY_IDX_RING, 0)); // 默认选“无”
+
+        switchDashed.setChecked(prefs.getBoolean(Constants.KEY_RING_DASHED, false));
     }
 
     private void startServiceWithSettings() {
@@ -151,6 +166,9 @@ public class MainActivity extends AppCompatActivity {
             serviceIntent.putExtra(Constants.KEY_PADDING_X, Integer.parseInt(etPadding.getText().toString()));
             serviceIntent.putExtra(Constants.KEY_PADDING_Y, Integer.parseInt(etPaddingY.getText().toString()));
             serviceIntent.putExtra(Constants.KEY_DIVISOR, Integer.parseInt(etDivisor.getText().toString()));
+            serviceIntent.putExtra(Constants.KEY_RING_DASHED, switchDashed.isChecked());
+            serviceIntent.putExtra(Constants.KEY_DASH_LENGTH, Integer.parseInt(etDashLength.getText().toString()));
+            serviceIntent.putExtra(Constants.KEY_DASH_GAP, Integer.parseInt(etDashGap.getText().toString()));
 
             // 4. 处理刷新率 (保留你的 "1s" 去掉 "s" 的逻辑)
             String selectedRate = refreshRateSpinner.getSelectedItem().toString();

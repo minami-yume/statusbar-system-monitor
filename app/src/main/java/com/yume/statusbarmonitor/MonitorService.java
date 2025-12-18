@@ -53,6 +53,7 @@ public class MonitorService extends Service {
     private String key1 = "";
     private String key2 = "";
     private String keyRing = "";
+    private float dashPhase = 0; // 用于记录虚线的偏移位置
 
     @Override
     public void onCreate() {
@@ -161,6 +162,9 @@ public class MonitorService extends Service {
                         progressPercent = -1;
                         break;
                 }
+
+                dashPhase -= -settings.getInt(Constants.KEY_DASH_LENGTH); // 每次偏移线段长度，负数是顺时针流动，正数是逆时针
+                if (dashPhase < -1000) dashPhase = 0; // 防止数值过大溢出
 
                 // 4. 更新通知
                 Notification updatedNotification = createNotification(settings, iconContent, titleContent, allInfoContent, progressPercent);
@@ -278,10 +282,30 @@ public class MonitorService extends Service {
         // android.graphics.RectF rect = new RectF(inset, inset, bitmapSize - inset, bitmapSize - inset);
         // 如果想要贴边，可以用 0，但可能会有锯齿
         android.graphics.RectF rect = new RectF(0, 0, bitmapSize, bitmapSize);
+        boolean isDashed = settings.getBoolean(Constants.KEY_RING_DASHED, false);
+        int dashLength = settings.getInt(Constants.KEY_DASH_LENGTH, 6);
+        int dashGap = settings.getInt(Constants.KEY_DASH_GAP, 2);
+
 
         if (progress >= 0) {
             if (progress > 100) progress = 100;
             strokePaint.setColor(Color.WHITE); // 纯白，交给系统变色
+
+            // 根据开关应用虚线效果
+            if (isDashed) {
+                //float dashLength = bitmapSize / 16f;
+                //float dashGap = bitmapSize / 4f;
+                //strokePaint.setPathEffect(new android.graphics.DashPathEffect(new float[]{dashLength, dashGap}, 0));
+
+                // 改用 BUTT 以获得精准的自定义控制
+                strokePaint.setStrokeCap(Paint.Cap.BUTT);
+
+                // 这里的第二个参数就是相位（动画的核心）
+                strokePaint.setPathEffect(new android.graphics.DashPathEffect(
+                        new float[]{(float) dashLength, (float) dashGap}, dashPhase));
+            } else {
+                strokePaint.setPathEffect(null); // 确保实线模式下没有残余效果
+            }
 
             android.graphics.Path path = new Path();
             path.addRect(rect, Path.Direction.CW);
@@ -455,6 +479,9 @@ public class MonitorService extends Service {
         loadedSettings.putString(Constants.KEY_PADDING_X, sharedPrefs.getString(Constants.KEY_PADDING_X, "-2"));
         loadedSettings.putString(Constants.KEY_PADDING_Y, sharedPrefs.getString(Constants.KEY_PADDING_Y, "0"));
         loadedSettings.putString(Constants.KEY_DIVISOR, sharedPrefs.getString(Constants.KEY_DIVISOR, "1000000000"));
+        loadedSettings.putBoolean(Constants.KEY_RING_DASHED, sharedPrefs.getBoolean(Constants.KEY_RING_DASHED, false));
+        loadedSettings.putString(Constants.KEY_DASH_LENGTH, sharedPrefs.getString(Constants.KEY_DASH_LENGTH,"6"));
+        loadedSettings.putString(Constants.KEY_DASH_GAP, sharedPrefs.getString(Constants.KEY_DASH_GAP,"2"));
 
         // 加载 Spinner 索引并转换为 Key
         int idx1 = sharedPrefs.getInt("pref_idx_data1_v2", 1);
@@ -494,6 +521,8 @@ public class MonitorService extends Service {
             loadedSettings.putInt(Constants.KEY_PADDING_X, Integer.parseInt(loadedSettings.getString(Constants.KEY_PADDING_X)));
             loadedSettings.putInt(Constants.KEY_PADDING_Y, Integer.parseInt(loadedSettings.getString(Constants.KEY_PADDING_Y)));
             loadedSettings.putInt(Constants.KEY_DIVISOR, Integer.parseInt(loadedSettings.getString(Constants.KEY_DIVISOR)));
+            loadedSettings.putInt(Constants.KEY_DASH_LENGTH, Integer.parseInt(loadedSettings.getString(Constants.KEY_DASH_LENGTH)));
+            loadedSettings.putInt(Constants.KEY_DASH_GAP, Integer.parseInt(loadedSettings.getString(Constants.KEY_DASH_GAP)));
         } catch (Exception e) {
             // 设置默认值防止崩溃
             loadedSettings.putInt(Constants.KEY_BITMAP_SIZE, 64);
@@ -502,6 +531,8 @@ public class MonitorService extends Service {
             loadedSettings.putInt(Constants.KEY_PADDING_X, -2);
             loadedSettings.putInt(Constants.KEY_PADDING_Y, 0);
             loadedSettings.putInt(Constants.KEY_DIVISOR, 1000000000);
+            loadedSettings.putInt(Constants.KEY_DASH_LENGTH, 6);
+            loadedSettings.putInt(Constants.KEY_DASH_GAP, 2);
         }
 
         return loadedSettings;

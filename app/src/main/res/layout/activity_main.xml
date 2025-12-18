@@ -69,6 +69,12 @@
             android:layout_height="wrap_content"
             android:minHeight="48dp"
             android:entries="@array/ring_labels" />
+        <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/switch_dashed_ring"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="使用流动虚线" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -158,10 +164,14 @@
             </com.google.android.material.textfield.TextInputLayout>
         </LinearLayout>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
         <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
+            android:layout_weight="1"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
             android:hint="图标尺寸 (64)"
             style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
             <com.google.android.material.textfield.TextInputEditText
@@ -172,10 +182,13 @@
                 android:text="64" />
         </com.google.android.material.textfield.TextInputLayout>
 
+        <Space android:layout_width="8dp"
+            android:layout_height="wrap_content"/>
+
         <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
+            android:layout_weight="1"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
             android:hint="功耗除数 (因机型而异)"
             style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
             <com.google.android.material.textfield.TextInputEditText
@@ -185,6 +198,44 @@
                 android:inputType="number"
                 android:text="1000000000" />
         </com.google.android.material.textfield.TextInputLayout>
+    </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:hint="虚线间隔"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/et_dash_gap"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="number"
+                    android:text="2" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <Space android:layout_width="8dp"
+                android:layout_height="wrap_content"/>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_weight="1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:hint="虚线长度 ()"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/et_dash_length"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="number"
+                    android:text="6" />
+            </com.google.android.material.textfield.TextInputLayout>
+        </LinearLayout>
+
+
 
     </LinearLayout>
 

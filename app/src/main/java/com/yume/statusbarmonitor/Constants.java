@@ -19,6 +19,11 @@ public final class Constants {
     public static final String KEY_FONT_CHOICE = "font_choice";
     public static final String KEY_DIVISOR = "divisor";
 
+    public static final String KEY_RING_DASHED = "pref_ring_dashed";
+
+    public static final String KEY_DASH_LENGTH = "pref_dash_length";
+    public static final String KEY_DASH_GAP = "pref_dashed_gap";
+
     // 字体文件名列表，与 arrays.xml 中的顺序对应
     public static final String[] FONT_FILENAMES = {
             null, // 默认字体 (索引 0)
