@@ -148,8 +148,14 @@ public class MonitorService extends Service {
                     case "storage_percent":
                         progressPercent = storageUsagePercent;
                         break;
-                    case "temperature":
+                    case "temperature_64":
+                        progressPercent = temperature * 25 / 16;
+                        break;
+                    case "temperature_50":
                         progressPercent = temperature * 2;
+                        break;
+                    case "temperature_40":
+                        progressPercent = temperature * 5 / 2;
                         break;
                     default:
                         progressPercent = -1;
@@ -522,6 +528,17 @@ public class MonitorService extends Service {
             // 获取两个数组
             String[] values = getResources().getStringArray(R.array.data_values);
             String[] labels = getResources().getStringArray(R.array.data_labels);
+
+            // 遍历英文数组找索引
+            for (int i = 0; i < values.length; i++) {
+                if (values[i].equals(key)) {
+                    // 返回相同位置的中文
+                    return labels[i];
+                }
+            }
+            // 获取两个数组
+            values = getResources().getStringArray(R.array.ring_values);
+            labels = getResources().getStringArray(R.array.ring_labels);
 
             // 遍历英文数组找索引
             for (int i = 0; i < values.length; i++) {

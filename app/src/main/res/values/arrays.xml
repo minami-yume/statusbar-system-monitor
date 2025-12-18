@@ -46,7 +46,9 @@
         <item>电量百分比</item>
         <item>内存占用</item>
         <item>存储占用</item>
-        <item>电池温度(满圈为50°C)</item>
+        <item>电池温度(满圈64°C)</item>
+        <item>电池温度(满圈50°C)</item>
+        <item>电池温度(满圈40°C)</item>
     </string-array>
 
     <string-array name="ring_values">
@@ -54,6 +56,8 @@
         <item>battery_percent</item>
         <item>memory_percent</item>
         <item>storage_percent</item>
-        <item>temperature</item>
+        <item>temperature_64</item>
+        <item>temperature_50</item>
+        <item>temperature_40</item>
     </string-array>
 </resources>
