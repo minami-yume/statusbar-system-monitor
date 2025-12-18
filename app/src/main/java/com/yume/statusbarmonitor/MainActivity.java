@@ -15,7 +15,7 @@ import com.google.android.material.textfield.TextInputEditText;
 
 public class MainActivity extends AppCompatActivity {
 
-    private TextInputEditText etSize1, etOffset1, etPadding, etBitmapSize, etDivisor;
+    private TextInputEditText etSize1, etOffset1, etPadding, etBitmapSize, etDivisor, etPaddingY;
     private Spinner spinnerData1, spinnerData2; // 使用 Spinner 替代 RadioGroup
     private Spinner refreshRateSpinner, fontSpinner;
     private TextView statusText;
@@ -50,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
         etPadding = findViewById(R.id.et_padding);
         etBitmapSize = findViewById(R.id.et_bitmap_size);
         etDivisor = findViewById(R.id.et_divisor);
+        etPaddingY = findViewById(R.id.et_paddingY);
 
         spinnerData1 = findViewById(R.id.spinner_data1);
         spinnerData2 = findViewById(R.id.spinner_data2);
@@ -92,6 +93,7 @@ public class MainActivity extends AppCompatActivity {
         editor.putString(Constants.KEY_OFFSET, etOffset1.getText().toString());
         editor.putString(Constants.KEY_BITMAP_SIZE, etBitmapSize.getText().toString());
         editor.putString(Constants.KEY_PADDING_X, etPadding.getText().toString());
+        editor.putString(Constants.KEY_PADDING_Y, etPaddingY.getText().toString());
         editor.putString(Constants.KEY_DIVISOR, etDivisor.getText().toString());
         editor.putInt(Constants.KEY_REFRESH_RATE_POS, refreshRateSpinner.getSelectedItemPosition());
         editor.putInt(Constants.KEY_FONT_CHOICE, fontSpinner.getSelectedItemPosition());
@@ -113,6 +115,7 @@ public class MainActivity extends AppCompatActivity {
         setSafeText(etOffset1, prefs, Constants.KEY_OFFSET, "15");
         setSafeText(etBitmapSize, prefs, Constants.KEY_BITMAP_SIZE, "64");
         setSafeText(etPadding, prefs, Constants.KEY_PADDING_X, "-2");
+        setSafeText(etPaddingY, prefs, Constants.KEY_PADDING_Y, "0");
         setSafeText(etDivisor, prefs, Constants.KEY_DIVISOR, "1000000000");
 
         refreshRateSpinner.setSelection(prefs.getInt(Constants.KEY_REFRESH_RATE_POS, 2));
@@ -146,6 +149,7 @@ public class MainActivity extends AppCompatActivity {
             serviceIntent.putExtra(Constants.KEY_OFFSET, Integer.parseInt(etOffset1.getText().toString()));
             serviceIntent.putExtra(Constants.KEY_BITMAP_SIZE, Integer.parseInt(etBitmapSize.getText().toString()));
             serviceIntent.putExtra(Constants.KEY_PADDING_X, Integer.parseInt(etPadding.getText().toString()));
+            serviceIntent.putExtra(Constants.KEY_PADDING_Y, Integer.parseInt(etPaddingY.getText().toString()));
             serviceIntent.putExtra(Constants.KEY_DIVISOR, Integer.parseInt(etDivisor.getText().toString()));
 
             // 4. 处理刷新率 (保留你的 "1s" 去掉 "s" 的逻辑)

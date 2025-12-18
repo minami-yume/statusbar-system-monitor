@@ -220,15 +220,15 @@ public class MonitorService extends Service {
             case "temperature": return temp + "°";
             case "current": return Math.abs(current) + ""; // 图标上通常不显示负号以节省空间
             case "voltage": return String.format("%.1f", (voltage / 1000f));
-            case "battery_percent": return battery_percent + "%";
+            case "battery_percent": return battery_percent + "";
             case "memory_mb": return memMB;
-            case "memory_percent": return memPercent + "%";
-            case "storage_percent": return storagePercent + "%";
+            case "memory_percent": return memPercent + "";
+            case "storage_percent": return storagePercent + "";
             case "watt":
                 double watts = (Math.abs(current) * voltage) / (double) wDivisor;
                 return String.format("%.1f", watts);
-            case "download_speed": return formatSpeedShort(downSpeed) + "↓";
-            case "upload_speed": return formatSpeedShort(upSpeed) + "↑";
+            case "download_speed": return formatSpeedShort(downSpeed) + "";
+            case "upload_speed": return formatSpeedShort(upSpeed) + "";
             case "storage_free": return String.format("%.1f",storageUsageFree);
             default: return "";
         }
@@ -269,7 +269,7 @@ public class MonitorService extends Service {
         strokePaint.setAntiAlias(true);
         strokePaint.setStyle(Paint.Style.STROKE);
 
-        float strokeWidth = bitmapSize / 10f;
+        float strokeWidth = bitmapSize / 8f;
         strokePaint.setStrokeWidth(strokeWidth);
         strokePaint.setStrokeCap(Paint.Cap.SQUARE);
 
@@ -300,6 +300,7 @@ public class MonitorService extends Service {
         int fontSize = settings.getInt(Constants.KEY_FONT_SIZE);
         int offset = settings.getInt(Constants.KEY_OFFSET);
         int paddingX = settings.getInt(Constants.KEY_PADDING_X);
+        int paddingY = settings.getInt(Constants.KEY_PADDING_Y);
 
         Paint textPaint = new Paint();
         textPaint.setColor(Color.WHITE);
@@ -309,10 +310,10 @@ public class MonitorService extends Service {
 
         float centerY = (bitmap.getHeight() / 2f) - (textPaint.descent() + textPaint.ascent()) / 2;
         if (lines.length > 0) {
-            canvas.drawText(lines[0], paddingX, centerY - offset, textPaint);
+            canvas.drawText(lines[0], paddingX, centerY - offset + paddingY, textPaint);
         }
         if (lines.length > 1) {
-            canvas.drawText(lines[1], paddingX, centerY + offset, textPaint);
+            canvas.drawText(lines[1], paddingX, centerY + offset + paddingY, textPaint);
         }
 
         IconCompat icon = IconCompat.createWithBitmap(bitmap);
@@ -452,6 +453,7 @@ public class MonitorService extends Service {
         loadedSettings.putString(Constants.KEY_OFFSET, sharedPrefs.getString(Constants.KEY_OFFSET, "15"));
         loadedSettings.putString(Constants.KEY_BITMAP_SIZE, sharedPrefs.getString(Constants.KEY_BITMAP_SIZE, "64"));
         loadedSettings.putString(Constants.KEY_PADDING_X, sharedPrefs.getString(Constants.KEY_PADDING_X, "-2"));
+        loadedSettings.putString(Constants.KEY_PADDING_Y, sharedPrefs.getString(Constants.KEY_PADDING_Y, "0"));
         loadedSettings.putString(Constants.KEY_DIVISOR, sharedPrefs.getString(Constants.KEY_DIVISOR, "1000000000"));
 
         // 加载 Spinner 索引并转换为 Key
@@ -490,6 +492,7 @@ public class MonitorService extends Service {
             loadedSettings.putInt(Constants.KEY_FONT_SIZE, Integer.parseInt(loadedSettings.getString(Constants.KEY_FONT_SIZE)));
             loadedSettings.putInt(Constants.KEY_OFFSET, Integer.parseInt(loadedSettings.getString(Constants.KEY_OFFSET)));
             loadedSettings.putInt(Constants.KEY_PADDING_X, Integer.parseInt(loadedSettings.getString(Constants.KEY_PADDING_X)));
+            loadedSettings.putInt(Constants.KEY_PADDING_Y, Integer.parseInt(loadedSettings.getString(Constants.KEY_PADDING_Y)));
             loadedSettings.putInt(Constants.KEY_DIVISOR, Integer.parseInt(loadedSettings.getString(Constants.KEY_DIVISOR)));
         } catch (Exception e) {
             // 设置默认值防止崩溃
@@ -497,6 +500,7 @@ public class MonitorService extends Service {
             loadedSettings.putInt(Constants.KEY_FONT_SIZE, 32);
             loadedSettings.putInt(Constants.KEY_OFFSET, 15);
             loadedSettings.putInt(Constants.KEY_PADDING_X, -2);
+            loadedSettings.putInt(Constants.KEY_PADDING_Y, 0);
             loadedSettings.putInt(Constants.KEY_DIVISOR, 1000000000);
         }
 
