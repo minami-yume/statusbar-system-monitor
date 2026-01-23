@@ -1,0 +1,31 @@
+name: Android Release Build & Publish
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  build_apk:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # This is crucial for uploading to a release
+
+    steps:
+      - name: Grant Execute Permission for gradlew
+        run: chmod +x ./gradlew
+      - name: Build Release APK
+        run: ./gradlew assembleRelease
+        env:
+          SIGNING_KEY_STORE_PASSWORD: ${{ secrets.KEY_STORE_PASSWORD }}
+          SIGNING_KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          SIGNING_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+
+      - name: Upload APK to Release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: app/build/outputs/apk/release/app-release.apk
+          asset_name: StatusMonitor.apk
+          asset_content_type: application/zip
